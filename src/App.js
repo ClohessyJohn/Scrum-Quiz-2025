@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { questions } from './questions';
 
 const questions = [
   {
