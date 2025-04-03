@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { questions } from './questions';
+import { questions } from "./questions";
 
 export default function App() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -61,7 +61,9 @@ export default function App() {
                 {questions[currentQuestion].explanation}
               </p>
               <button onClick={nextQuestion}>
-                {currentQuestion < questions.length - 1 ? "Next Question" : "Finish Quiz"}
+                {currentQuestion < questions.length - 1
+                  ? "Next Question"
+                  : "Finish Quiz"}
               </button>
             </div>
           )}
@@ -76,3 +78,4 @@ export default function App() {
     </div>
   );
 }
+
