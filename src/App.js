@@ -9,14 +9,20 @@ export default function App() {
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [incorrectAnswers, setIncorrectAnswers] = useState(0);
   const [quizCompleted, setQuizCompleted] = useState(false);
+  const [missedQuestions, setMissedQuestions] = useState([]);
+  const [showReview, setShowReview] = useState(false);
 
   const handleAnswer = (index) => {
     setSelectedOption(index);
     setShowExplanation(true);
-    if (index === questions[currentQuestion].correct) {
+
+    const currentQ = questions[currentQuestion];
+
+    if (index === currentQ.correct) {
       setCorrectAnswers((prev) => prev + 1);
     } else {
       setIncorrectAnswers((prev) => prev + 1);
+      setMissedQuestions((prev) => [...prev, currentQ]);
     }
   };
 
@@ -38,6 +44,8 @@ export default function App() {
     setCorrectAnswers(0);
     setIncorrectAnswers(0);
     setQuizCompleted(false);
+    setMissedQuestions([]);
+    setShowReview(false);
   };
 
   return (
@@ -130,7 +138,7 @@ export default function App() {
             </div>
           )}
         </div>
-      ) : (
+      ) : !showReview ? (
         <div style={{ textAlign: "center" }}>
           <h2>🎉 Quiz Completed!</h2>
           <p>✅ Correct Answers: {correctAnswers}</p>
@@ -138,10 +146,29 @@ export default function App() {
           <p style={{ marginTop: 20, fontWeight: "bold" }}>
             Final Score: {Math.round((correctAnswers / questions.length) * 100)}%
           </p>
+
+          {missedQuestions.length > 0 && (
+            <button
+              onClick={() => setShowReview(true)}
+              style={{
+                marginTop: "20px",
+                marginRight: "10px",
+                padding: "10px 20px",
+                backgroundColor: "#ffc107",
+                color: "#000",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer"
+              }}
+            >
+              Review Missed Questions
+            </button>
+          )}
+
           <button
             onClick={resetQuiz}
             style={{
-              marginTop: "25px",
+              marginTop: "20px",
               padding: "10px 20px",
               backgroundColor: "#28a745",
               color: "white",
@@ -153,8 +180,36 @@ export default function App() {
             Retake Quiz
           </button>
         </div>
+      ) : (
+        <div>
+          <h2 style={{ textAlign: "center" }}>📘 Review: Missed Questions</h2>
+          {missedQuestions.map((q, i) => (
+            <div key={i} style={{ background: "#fff", padding: 20, margin: "20px 0", borderRadius: 8, border: "1px solid #ddd" }}>
+              <h4>{q.question}</h4>
+              <p><strong>Correct Answer:</strong> {q.options[q.correct]}</p>
+              <p style={{ fontSize: "0.95rem", color: "#555" }}>{q.explanation}</p>
+            </div>
+          ))}
+          <div style={{ textAlign: "center" }}>
+            <button
+              onClick={resetQuiz}
+              style={{
+                marginTop: "20px",
+                padding: "10px 20px",
+                backgroundColor: "#007bff",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer"
+              }}
+            >
+              Back to Start
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
 }
+
 
