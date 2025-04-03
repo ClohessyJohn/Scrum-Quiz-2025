@@ -15,7 +15,6 @@ export default function App() {
   const handleAnswer = (index) => {
     setSelectedOption(index);
     setShowExplanation(true);
-
     const currentQ = questions[currentQuestion];
 
     if (index === currentQ.correct) {
@@ -81,7 +80,10 @@ export default function App() {
         </div>
       ) : !quizCompleted ? (
         <div>
-          <h2>{questions[currentQuestion].question}</h2>
+          <p style={{ fontSize: "0.95rem", color: "#888", marginBottom: 5 }}>
+            Question {currentQuestion + 1} of {questions.length}
+          </p>
+          <h2 style={{ marginBottom: 15 }}>{questions[currentQuestion].question}</h2>
           {questions[currentQuestion].options.map((option, index) => (
             <button
               key={index}
@@ -184,7 +186,16 @@ export default function App() {
         <div>
           <h2 style={{ textAlign: "center" }}>📘 Review: Missed Questions</h2>
           {missedQuestions.map((q, i) => (
-            <div key={i} style={{ background: "#fff", padding: 20, margin: "20px 0", borderRadius: 8, border: "1px solid #ddd" }}>
+            <div
+              key={i}
+              style={{
+                background: "#fff",
+                padding: 20,
+                margin: "20px 0",
+                borderRadius: 8,
+                border: "1px solid #ddd"
+              }}
+            >
               <h4>{q.question}</h4>
               <p><strong>Correct Answer:</strong> {q.options[q.correct]}</p>
               <p style={{ fontSize: "0.95rem", color: "#555" }}>{q.explanation}</p>
@@ -211,5 +222,6 @@ export default function App() {
     </div>
   );
 }
+
 
 
