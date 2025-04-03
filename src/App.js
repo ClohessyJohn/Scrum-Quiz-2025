@@ -19,6 +19,7 @@ export default function App() {
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [missedQuestions, setMissedQuestions] = useState([]);
   const [showReview, setShowReview] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(60 * 60); // 60 minutes
 
   const letterMap = ["A", "B", "C", "D"];
 
@@ -35,6 +36,22 @@ export default function App() {
       setQuestions(preparedQuestions);
     }
   }, [quizStarted]);
+
+  useEffect(() => {
+    let timer;
+    if (quizStarted && !quizCompleted && timeLeft > 0) {
+      timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+    } else if (timeLeft === 0) {
+      setQuizCompleted(true);
+    }
+    return () => clearTimeout(timer);
+  }, [quizStarted, timeLeft, quizCompleted]);
+
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
 
   const handleAnswer = (index) => {
     setSelectedOption(index);
@@ -70,10 +87,13 @@ export default function App() {
     setQuizCompleted(false);
     setMissedQuestions([]);
     setShowReview(false);
+    setTimeLeft(60 * 60);
   };
 
+  const progressPercentage = Math.round(((currentQuestion + 1) / questions.length) * 100);
+
   return (
-    <div style={{ maxWidth: "600px", margin: "40px auto", fontFamily: "Arial, sans-serif" }}>
+    <div style={{ maxWidth: "700px", margin: "40px auto", fontFamily: "Arial, sans-serif" }}>
       <header style={{ textAlign: "center", marginBottom: 40 }}>
         <h1 style={{ fontSize: "2rem", marginBottom: 10 }}>Scrum Master Practice Quiz 2025</h1>
         <p style={{ fontSize: "1rem", color: "#666" }}>
@@ -108,9 +128,24 @@ export default function App() {
           <p>Loading questions...</p>
         ) : (
           <div>
-            <p style={{ fontSize: "0.95rem", color: "#888", marginBottom: 5 }}>
-              Question {currentQuestion + 1} of {questions.length}
-            </p>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+              <p style={{ fontSize: "0.95rem", color: "#888" }}>
+                Question {currentQuestion + 1} of {questions.length}
+              </p>
+              <p style={{ fontSize: "0.95rem", color: "#e63946" }}>
+                Time Left: {formatTime(timeLeft)}
+              </p>
+            </div>
+            <div style={{ background: "#eee", borderRadius: 5, overflow: "hidden", marginBottom: 20 }}>
+              <div
+                style={{
+                  width: `${progressPercentage}%`,
+                  height: "8px",
+                  backgroundColor: "#007bff",
+                  transition: "width 0.3s ease"
+                }}
+              ></div>
+            </div>
             <h2 style={{ marginBottom: 15 }}>{questions[currentQuestion].question}</h2>
             {questions[currentQuestion].shuffledOptions.map((option, index) => (
               <button
@@ -251,3 +286,4 @@ export default function App() {
     </div>
   );
 }
+
