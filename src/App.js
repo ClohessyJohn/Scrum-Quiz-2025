@@ -10,6 +10,7 @@ function shuffleArray(array) {
 
 export default function App() {
   const [quizStarted, setQuizStarted] = useState(false);
+  const [quizMode, setQuizMode] = useState("practice");
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -19,7 +20,8 @@ export default function App() {
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [missedQuestions, setMissedQuestions] = useState([]);
   const [showReview, setShowReview] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(60 * 60); // 60 minutes
+  const [timeLeft, setTimeLeft] = useState(30 * 60); // 30 minutes
+  const [darkMode, setDarkMode] = useState(false);
 
   const letterMap = ["A", "B", "C", "D"];
 
@@ -39,13 +41,13 @@ export default function App() {
 
   useEffect(() => {
     let timer;
-    if (quizStarted && !quizCompleted && timeLeft > 0) {
+    if (quizStarted && quizMode === "test" && !quizCompleted && timeLeft > 0) {
       timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-    } else if (timeLeft === 0) {
+    } else if (quizMode === "test" && timeLeft === 0) {
       setQuizCompleted(true);
     }
     return () => clearTimeout(timer);
-  }, [quizStarted, timeLeft, quizCompleted]);
+  }, [quizStarted, timeLeft, quizCompleted, quizMode]);
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60).toString().padStart(2, '0');
@@ -87,203 +89,98 @@ export default function App() {
     setQuizCompleted(false);
     setMissedQuestions([]);
     setShowReview(false);
-    setTimeLeft(60 * 60);
+    setTimeLeft(30 * 60);
   };
 
   const progressPercentage = Math.round(((currentQuestion + 1) / questions.length) * 100);
+  const themeClass = darkMode ? "dark" : "light";
+
+  const downloadResults = () => {
+    const text = missedQuestions.map((q, i) => `${i + 1}. ${q.question}\nCorrect Answer: ${q.options[q.correct]}\nExplanation: ${q.explanation}\n\n`).join('');
+    const blob = new Blob([text], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'scrum-quiz-results.txt';
+    link.click();
+  };
 
   return (
-    <div style={{ maxWidth: "700px", margin: "40px auto", fontFamily: "Arial, sans-serif" }}>
+    <div className={`app-container ${themeClass}`} style={{ maxWidth: "700px", margin: "40px auto", fontFamily: "Arial, sans-serif" }}>
       <header style={{ textAlign: "center", marginBottom: 40 }}>
-        <h1 style={{ fontSize: "2rem", marginBottom: 10 }}>Scrum Master Practice Quiz 2025</h1>
-        <p style={{ fontSize: "1rem", color: "#666" }}>
-          Designed by John Clohessy · Not affiliated with Scrum.org
-        </p>
+        <h1>Scrum Master Quiz 2025</h1>
+        <p>Designed by John Clohessy · Not affiliated with Scrum.org</p>
+        <button
+          onClick={() => setDarkMode(!darkMode)}
+          style={{ marginTop: 10, padding: "5px 10px", cursor: "pointer" }}
+        >
+          Toggle {darkMode ? "Light" : "Dark"} Mode
+        </button>
       </header>
 
       {!quizStarted ? (
         <div style={{ textAlign: "center" }}>
-          <p style={{ fontSize: "1.1rem", marginBottom: 20 }}>
-            This free quiz is designed to help you prepare for the PSM I certification and reinforce key Scrum concepts.
-          </p>
-          <p style={{ fontSize: "0.9rem", color: "#888", marginBottom: 30 }}>
-            This is an independent study tool created by an experienced Scrum Master and Agile Coach. It is not affiliated with Scrum.org or any certification body.
-          </p>
-          <button
-            onClick={() => setQuizStarted(true)}
-            style={{
-              padding: "10px 20px",
-              backgroundColor: "#007bff",
-              color: "white",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer"
-            }}
-          >
-            Start Quiz
-          </button>
+          <p>Select a quiz mode to begin:</p>
+          <button onClick={() => { setQuizMode("practice"); setQuizStarted(true); }}>Practice Mode</button>
+          <button style={{ marginLeft: 10 }} onClick={() => { setQuizMode("test"); setQuizStarted(true); }}>Test Mode</button>
         </div>
       ) : !quizCompleted ? (
         questions.length === 0 ? (
-          <p>Loading questions...</p>
+          <p>Loading...</p>
         ) : (
           <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-              <p style={{ fontSize: "0.95rem", color: "#888" }}>
-                Question {currentQuestion + 1} of {questions.length}
-              </p>
-              <p style={{ fontSize: "0.95rem", color: "#e63946" }}>
-                Time Left: {formatTime(timeLeft)}
-              </p>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span>Question {currentQuestion + 1} of {questions.length}</span>
+              {quizMode === "test" && <span>Time Left: {formatTime(timeLeft)}</span>}
             </div>
-            <div style={{ background: "#eee", borderRadius: 5, overflow: "hidden", marginBottom: 20 }}>
-              <div
-                style={{
-                  width: `${progressPercentage}%`,
-                  height: "8px",
-                  backgroundColor: "#007bff",
-                  transition: "width 0.3s ease"
-                }}
-              ></div>
+            <div style={{ background: "#ccc", height: "8px", margin: "10px 0" }}>
+              <div style={{ width: `${progressPercentage}%`, background: "#007bff", height: "100%" }}></div>
             </div>
-            <h2 style={{ marginBottom: 15 }}>{questions[currentQuestion].question}</h2>
-            {questions[currentQuestion].shuffledOptions.map((option, index) => (
+            <h3>{questions[currentQuestion].question}</h3>
+            {questions[currentQuestion].category && <p style={{ fontSize: "0.85rem", color: "#777" }}>[{questions[currentQuestion].category}]</p>}
+            {questions[currentQuestion].shuffledOptions.map((opt, idx) => (
               <button
-                key={index}
-                onClick={() => handleAnswer(index)}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  padding: "10px",
-                  margin: "10px 0",
-                  backgroundColor:
-                    selectedOption === index
-                      ? index === questions[currentQuestion].correctIndex
-                        ? "#d4edda"
-                        : "#f8d7da"
-                      : "#f0f0f0",
-                  border: "1px solid #ccc",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                  textAlign: "left"
-                }}
+                key={idx}
+                onClick={() => handleAnswer(idx)}
+                style={{ display: "block", margin: "10px 0" }}
               >
-                <strong>{letterMap[index]}.</strong> {option}
+                <strong>{letterMap[idx]}.</strong> {opt}
               </button>
             ))}
-            {showExplanation && (
-              <div
-                style={{
-                  backgroundColor: "#f9f9f9",
-                  padding: "15px",
-                  marginTop: "20px",
-                  borderRadius: "5px"
-                }}
-              >
-                <p>
-                  {selectedOption === questions[currentQuestion].correctIndex
-                    ? "✅ Correct! "
-                    : "❌ Incorrect! "}
-                  {questions[currentQuestion].explanation}
-                </p>
-                <button
-                  onClick={nextQuestion}
-                  style={{
-                    marginTop: "15px",
-                    padding: "10px 20px",
-                    backgroundColor: "#007bff",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer"
-                  }}
-                >
-                  {currentQuestion < questions.length - 1 ? "Next Question" : "Finish Quiz"}
-                </button>
+            {quizMode === "practice" && showExplanation && (
+              <div style={{ backgroundColor: "#f0f0f0", padding: "10px", marginTop: "10px" }}>
+                <p><strong>Explanation:</strong> {questions[currentQuestion].explanation}</p>
+                <button onClick={nextQuestion}>Next</button>
               </div>
+            )}
+            {quizMode === "test" && selectedOption !== null && (
+              <button onClick={nextQuestion} style={{ marginTop: 10 }}>Next</button>
             )}
           </div>
         )
       ) : !showReview ? (
         <div style={{ textAlign: "center" }}>
-          <h2>🎉 Quiz Completed!</h2>
-          <p>✅ Correct Answers: {correctAnswers}</p>
-          <p>❌ Incorrect Answers: {incorrectAnswers}</p>
-          <p style={{ marginTop: 20, fontWeight: "bold" }}>
-            Final Score: {Math.round((correctAnswers / questions.length) * 100)}%
-          </p>
-
-          {missedQuestions.length > 0 && (
-            <button
-              onClick={() => setShowReview(true)}
-              style={{
-                marginTop: "20px",
-                marginRight: "10px",
-                padding: "10px 20px",
-                backgroundColor: "#ffc107",
-                color: "#000",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer"
-              }}
-            >
-              Review Missed Questions
-            </button>
-          )}
-
-          <button
-            onClick={resetQuiz}
-            style={{
-              marginTop: "20px",
-              padding: "10px 20px",
-              backgroundColor: "#28a745",
-              color: "white",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer"
-            }}
-          >
-            Retake Quiz
-          </button>
+          <h2>Quiz Complete</h2>
+          <p>Correct: {correctAnswers} | Incorrect: {incorrectAnswers}</p>
+          <p>Score: {Math.round((correctAnswers / questions.length) * 100)}%</p>
+          <button onClick={() => setShowReview(true)}>Review Missed Questions</button>
+          <button onClick={downloadResults} style={{ marginLeft: 10 }}>Download Results</button>
+          <button onClick={resetQuiz} style={{ marginLeft: 10 }}>Start Over</button>
         </div>
       ) : (
         <div>
-          <h2 style={{ textAlign: "center" }}>📘 Review: Missed Questions</h2>
+          <h2>Review Missed Questions</h2>
           {missedQuestions.map((q, i) => (
-            <div
-              key={i}
-              style={{
-                background: "#fff",
-                padding: 20,
-                margin: "20px 0",
-                borderRadius: 8,
-                border: "1px solid #ddd"
-              }}
-            >
-              <h4>{q.question}</h4>
+            <div key={i} style={{ border: "1px solid #ddd", padding: 10, marginBottom: 10 }}>
+              <p><strong>{q.question}</strong></p>
               <p><strong>Correct Answer:</strong> {q.options[q.correct]}</p>
-              <p style={{ fontSize: "0.95rem", color: "#555" }}>{q.explanation}</p>
+              <p>{q.explanation}</p>
             </div>
           ))}
           <div style={{ textAlign: "center" }}>
-            <button
-              onClick={resetQuiz}
-              style={{
-                marginTop: "20px",
-                padding: "10px 20px",
-                backgroundColor: "#007bff",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer"
-              }}
-            >
-              Back to Start
-            </button>
+            <button onClick={resetQuiz}>Back to Start</button>
           </div>
         </div>
       )}
     </div>
   );
 }
-
