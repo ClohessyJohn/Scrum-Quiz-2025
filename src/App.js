@@ -20,6 +20,8 @@ export default function App() {
   const [missedQuestions, setMissedQuestions] = useState([]);
   const [showReview, setShowReview] = useState(false);
 
+  const letterMap = ["A", "B", "C", "D"];
+
   useEffect(() => {
     if (quizStarted) {
       const preparedQuestions = rawQuestions.map((q) => {
@@ -70,8 +72,6 @@ export default function App() {
     setShowReview(false);
   };
 
-  const letterMap = ["A", "B", "C", "D"];
-
   return (
     <div style={{ maxWidth: "600px", margin: "40px auto", fontFamily: "Arial, sans-serif" }}>
       <header style={{ textAlign: "center", marginBottom: 40 }}>
@@ -104,67 +104,71 @@ export default function App() {
           </button>
         </div>
       ) : !quizCompleted ? (
-        <div>
-          <p style={{ fontSize: "0.95rem", color: "#888", marginBottom: 5 }}>
-            Question {currentQuestion + 1} of {questions.length}
-          </p>
-          <h2 style={{ marginBottom: 15 }}>{questions[currentQuestion].question}</h2>
-          {questions[currentQuestion].shuffledOptions.map((option, index) => (
-            <button
-              key={index}
-              onClick={() => handleAnswer(index)}
-              style={{
-                display: "block",
-                width: "100%",
-                padding: "10px",
-                margin: "10px 0",
-                backgroundColor:
-                  selectedOption === index
-                    ? index === questions[currentQuestion].correctIndex
-                      ? "#d4edda"
-                      : "#f8d7da"
-                    : "#f0f0f0",
-                border: "1px solid #ccc",
-                borderRadius: "5px",
-                cursor: "pointer",
-                textAlign: "left"
-              }}
-            >
-              <strong>{letterMap[index]}.</strong> {option}
-            </button>
-          ))}
-          {showExplanation && (
-            <div
-              style={{
-                backgroundColor: "#f9f9f9",
-                padding: "15px",
-                marginTop: "20px",
-                borderRadius: "5px"
-              }}
-            >
-              <p>
-                {selectedOption === questions[currentQuestion].correctIndex
-                  ? "✅ Correct! "
-                  : "❌ Incorrect! "}
-                {questions[currentQuestion].explanation}
-              </p>
+        questions.length === 0 ? (
+          <p>Loading questions...</p>
+        ) : (
+          <div>
+            <p style={{ fontSize: "0.95rem", color: "#888", marginBottom: 5 }}>
+              Question {currentQuestion + 1} of {questions.length}
+            </p>
+            <h2 style={{ marginBottom: 15 }}>{questions[currentQuestion].question}</h2>
+            {questions[currentQuestion].shuffledOptions.map((option, index) => (
               <button
-                onClick={nextQuestion}
+                key={index}
+                onClick={() => handleAnswer(index)}
                 style={{
-                  marginTop: "15px",
-                  padding: "10px 20px",
-                  backgroundColor: "#007bff",
-                  color: "white",
-                  border: "none",
+                  display: "block",
+                  width: "100%",
+                  padding: "10px",
+                  margin: "10px 0",
+                  backgroundColor:
+                    selectedOption === index
+                      ? index === questions[currentQuestion].correctIndex
+                        ? "#d4edda"
+                        : "#f8d7da"
+                      : "#f0f0f0",
+                  border: "1px solid #ccc",
                   borderRadius: "5px",
-                  cursor: "pointer"
+                  cursor: "pointer",
+                  textAlign: "left"
                 }}
               >
-                {currentQuestion < questions.length - 1 ? "Next Question" : "Finish Quiz"}
+                <strong>{letterMap[index]}.</strong> {option}
               </button>
-            </div>
-          )}
-        </div>
+            ))}
+            {showExplanation && (
+              <div
+                style={{
+                  backgroundColor: "#f9f9f9",
+                  padding: "15px",
+                  marginTop: "20px",
+                  borderRadius: "5px"
+                }}
+              >
+                <p>
+                  {selectedOption === questions[currentQuestion].correctIndex
+                    ? "✅ Correct! "
+                    : "❌ Incorrect! "}
+                  {questions[currentQuestion].explanation}
+                </p>
+                <button
+                  onClick={nextQuestion}
+                  style={{
+                    marginTop: "15px",
+                    padding: "10px 20px",
+                    backgroundColor: "#007bff",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer"
+                  }}
+                >
+                  {currentQuestion < questions.length - 1 ? "Next Question" : "Finish Quiz"}
+                </button>
+              </div>
+            )}
+          </div>
+        )
       ) : !showReview ? (
         <div style={{ textAlign: "center" }}>
           <h2>🎉 Quiz Completed!</h2>
@@ -247,4 +251,3 @@ export default function App() {
     </div>
   );
 }
-
