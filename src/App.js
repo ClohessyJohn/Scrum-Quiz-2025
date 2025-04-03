@@ -1,8 +1,16 @@
-import React, { useState } from "react";
-import { questions } from "./questions";
+import React, { useState, useEffect } from "react";
+import { questions as rawQuestions } from "./questions";
+
+function shuffleArray(array) {
+  return array
+    .map((item) => ({ item, sort: Math.random() }))
+    .sort((a, b) => a.sort - b.sort)
+    .map(({ item }) => item);
+}
 
 export default function App() {
   const [quizStarted, setQuizStarted] = useState(false);
+  const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [showExplanation, setShowExplanation] = useState(false);
@@ -12,12 +20,26 @@ export default function App() {
   const [missedQuestions, setMissedQuestions] = useState([]);
   const [showReview, setShowReview] = useState(false);
 
+  useEffect(() => {
+    if (quizStarted) {
+      const preparedQuestions = rawQuestions.map((q) => {
+        const shuffled = shuffleArray(q.options);
+        return {
+          ...q,
+          shuffledOptions: shuffled,
+          correctIndex: shuffled.indexOf(q.options[q.correct])
+        };
+      });
+      setQuestions(preparedQuestions);
+    }
+  }, [quizStarted]);
+
   const handleAnswer = (index) => {
     setSelectedOption(index);
     setShowExplanation(true);
     const currentQ = questions[currentQuestion];
 
-    if (index === currentQ.correct) {
+    if (index === currentQ.correctIndex) {
       setCorrectAnswers((prev) => prev + 1);
     } else {
       setIncorrectAnswers((prev) => prev + 1);
@@ -37,6 +59,7 @@ export default function App() {
 
   const resetQuiz = () => {
     setQuizStarted(false);
+    setQuestions([]);
     setCurrentQuestion(0);
     setSelectedOption(null);
     setShowExplanation(false);
@@ -46,6 +69,8 @@ export default function App() {
     setMissedQuestions([]);
     setShowReview(false);
   };
+
+  const letterMap = ["A", "B", "C", "D"];
 
   return (
     <div style={{ maxWidth: "600px", margin: "40px auto", fontFamily: "Arial, sans-serif" }}>
@@ -84,7 +109,7 @@ export default function App() {
             Question {currentQuestion + 1} of {questions.length}
           </p>
           <h2 style={{ marginBottom: 15 }}>{questions[currentQuestion].question}</h2>
-          {questions[currentQuestion].options.map((option, index) => (
+          {questions[currentQuestion].shuffledOptions.map((option, index) => (
             <button
               key={index}
               onClick={() => handleAnswer(index)}
@@ -95,7 +120,7 @@ export default function App() {
                 margin: "10px 0",
                 backgroundColor:
                   selectedOption === index
-                    ? index === questions[currentQuestion].correct
+                    ? index === questions[currentQuestion].correctIndex
                       ? "#d4edda"
                       : "#f8d7da"
                     : "#f0f0f0",
@@ -105,7 +130,7 @@ export default function App() {
                 textAlign: "left"
               }}
             >
-              {option}
+              <strong>{letterMap[index]}.</strong> {option}
             </button>
           ))}
           {showExplanation && (
@@ -118,7 +143,7 @@ export default function App() {
               }}
             >
               <p>
-                {selectedOption === questions[currentQuestion].correct
+                {selectedOption === questions[currentQuestion].correctIndex
                   ? "✅ Correct! "
                   : "❌ Incorrect! "}
                 {questions[currentQuestion].explanation}
@@ -222,6 +247,4 @@ export default function App() {
     </div>
   );
 }
-
-
 
