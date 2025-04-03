@@ -30,6 +30,16 @@ export default function App() {
     }
   };
 
+  const resetQuiz = () => {
+    setQuizStarted(false);
+    setCurrentQuestion(0);
+    setSelectedOption(null);
+    setShowExplanation(false);
+    setCorrectAnswers(0);
+    setIncorrectAnswers(0);
+    setQuizCompleted(false);
+  };
+
   return (
     <div style={{ maxWidth: "600px", margin: "40px auto", fontFamily: "Arial, sans-serif" }}>
       <header style={{ textAlign: "center", marginBottom: 40 }}>
@@ -122,13 +132,29 @@ export default function App() {
         </div>
       ) : (
         <div style={{ textAlign: "center" }}>
-          <h2>Quiz Completed!</h2>
+          <h2>🎉 Quiz Completed!</h2>
           <p>✅ Correct Answers: {correctAnswers}</p>
           <p>❌ Incorrect Answers: {incorrectAnswers}</p>
+          <p style={{ marginTop: 20, fontWeight: "bold" }}>
+            Final Score: {Math.round((correctAnswers / questions.length) * 100)}%
+          </p>
+          <button
+            onClick={resetQuiz}
+            style={{
+              marginTop: "25px",
+              padding: "10px 20px",
+              backgroundColor: "#28a745",
+              color: "white",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer"
+            }}
+          >
+            Retake Quiz
+          </button>
         </div>
       )}
     </div>
   );
 }
-
 
