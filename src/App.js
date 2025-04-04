@@ -11,7 +11,7 @@ export default function App() {
   const [incorrectAnswers, setIncorrectAnswers] = useState(0);
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
-  const [timer, setTimer] = useState(60 * 30); // ⚡ Changed: 30 minutes (1800s)
+  const [timer, setTimer] = useState(60 * 20); // 20 minutes
 
   useEffect(() => {
     let interval;
@@ -57,7 +57,7 @@ export default function App() {
     setCorrectAnswers(0);
     setIncorrectAnswers(0);
     setQuizCompleted(false);
-    setTimer(60 * 30); // ⚡ Reset to 30 min
+    setTimer(60 * 20);
   };
 
   const formatTime = (seconds) => {
@@ -66,8 +66,6 @@ export default function App() {
     return `${m}:${s}`;
   };
 
-  const passed = (correctAnswers / questions.length) >= 0.85;
-
   if (mode === "landing") {
     return (
       <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ textAlign: "center", padding: 40 }}>
@@ -75,7 +73,7 @@ export default function App() {
         <p>Designed by <strong>John Clohessy</strong> • Not affiliated with Scrum.org</p>
         <p>This free quiz is designed to help you prepare for the PSM I certification and reinforce key Scrum concepts.</p>
         <p style={{ fontSize: "0.9rem", color: "gray" }}>
-          It is an independent study tool created by an experienced Scrum Master and Agile Coach.
+          It is an independent study tool created by an experienced Scrum Master and Agile Coach. It is not affiliated with Scrum.org or any certification body.
         </p>
         <div style={{ marginTop: 30 }}>
           <button onClick={() => setMode("practice")} className="primary-btn">Start Quiz</button>
@@ -104,6 +102,7 @@ export default function App() {
       )}
 
       <div style={{ marginBottom: 10 }}>Question {currentQuestion + 1} of {questions.length}</div>
+
       <div style={{ backgroundColor: "#eee", height: 6, marginBottom: 20 }}>
         <div style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%`, height: "100%", backgroundColor: "dodgerblue" }}></div>
       </div>
@@ -112,7 +111,7 @@ export default function App() {
         <div>
           <h3 style={{ fontSize: "1.2rem" }}><strong>{questions[currentQuestion].question}</strong></h3>
           {questions[currentQuestion].options.map((option, index) => {
-            const optionLabel = String.fromCharCode(65 + index);
+            const optionLabel = String.fromCharCode(65 + index); // A, B, C, D
             const isSelected = selectedOption === index;
             const isCorrect = index === questions[currentQuestion].correct;
             let bg = "";
@@ -141,7 +140,7 @@ export default function App() {
           })}
 
           {showExplanation && (
-            <div style={{ backgroundColor: "#f1f1f1", padding: 20, marginTop: 20 }}>
+            <div style={{ backgroundColor: "#f1f1f1", color: darkMode ? "#000" : undefined, padding: 20, marginTop: 20 }}>
               <p>
                 <strong>{selectedOption === questions[currentQuestion].correct ? "✅ Correct!" : "❌ Incorrect!"}</strong> {questions[currentQuestion].explanation}
               </p>
@@ -154,14 +153,18 @@ export default function App() {
           <h2>Quiz Completed!</h2>
           <p>✅ Correct Answers: {correctAnswers}</p>
           <p>❌ Incorrect Answers: {incorrectAnswers}</p>
-          {mode === "test" && (
-            <p style={{ fontSize: "1.1rem", fontWeight: "bold", color: passed ? "green" : "red" }}>
-              {passed ? "🎉 Congratulations! You passed." : "❌ You did not reach the 85% threshold."}
-            </p>
-          )}
+          <h3 style={{ marginTop: "1rem", color: correctAnswers >= Math.ceil(questions.length * 0.85) ? "green" : "crimson" }}>
+            {correctAnswers >= Math.ceil(questions.length * 0.85)
+              ? "🎉 Congratulations! You passed the quiz."
+              : "⚠️ You did not reach the passing score of 85%."}
+          </h3>
+          <p style={{ fontSize: "0.9rem", color: "gray" }}>
+            Your Score: {Math.round((correctAnswers / questions.length) * 100)}%
+          </p>
           <button onClick={resetQuiz}>Restart Quiz</button>
         </div>
       )}
     </div>
   );
 }
+
