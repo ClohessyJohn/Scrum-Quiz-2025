@@ -170,7 +170,7 @@ export default function App() {
           })}
 
           {showExplanation && (
-            <div style={{ backgroundColor: "#f1f1f1", padding: 20, marginTop: 20 }}>
+            <div className="explanation-box">
               <p>
                 <strong>{selectedOption === questions[currentQuestion].correct ? "✅ Correct!" : "❌ Incorrect!"}</strong> {questions[currentQuestion].explanation}
               </p>
