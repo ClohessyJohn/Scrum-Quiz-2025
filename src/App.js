@@ -1,24 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { questions } from "./questions";
+import "./App.css";
 
 export default function App() {
+  const [mode, setMode] = useState("landing");
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [showExplanation, setShowExplanation] = useState(false);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [incorrectAnswers, setIncorrectAnswers] = useState(0);
   const [quizCompleted, setQuizCompleted] = useState(false);
-  const [mode, setMode] = useState(null); // null, "practice", or "test"
   const [darkMode, setDarkMode] = useState(false);
-  const [startTime, setStartTime] = useState(null);
+  const [timer, setTimer] = useState(60 * 20); // 20 minutes
 
-  const handleStart = (selectedMode) => {
-    setMode(selectedMode);
-    setStartTime(selectedMode === "test" ? Date.now() : null);
-  };
+  useEffect(() => {
+    let interval;
+    if (mode === "test" && !quizCompleted) {
+      interval = setInterval(() => {
+        setTimer((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            setQuizCompleted(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [mode, quizCompleted]);
 
   const handleAnswer = (index) => {
-    if (selectedOption !== null) return; // prevent multiple clicks
     setSelectedOption(index);
     setShowExplanation(true);
     if (index === questions[currentQuestion].correct) {
@@ -38,105 +50,112 @@ export default function App() {
     }
   };
 
-  const getOptionLabel = (i) => String.fromCharCode(65 + i); // A, B, C, D
+  const resetQuiz = () => {
+    setCurrentQuestion(0);
+    setSelectedOption(null);
+    setShowExplanation(false);
+    setCorrectAnswers(0);
+    setIncorrectAnswers(0);
+    setQuizCompleted(false);
+    setTimer(60 * 20);
+  };
 
-  const renderLandingPage = () => (
-    <div className="landing">
-      <h1>Scrum Master Practice Quiz 2025</h1>
-      <p>Study for your Scrum.org PSM I exam — built by <strong>John Clohessy</strong></p>
-      <button onClick={() => handleStart("practice")}>Practice Mode</button>
-      <button onClick={() => handleStart("test")}>Test Mode</button>
-      <button onClick={() => setDarkMode(!darkMode)}>
-        {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
-      </button>
-    </div>
-  );
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, "0");
+    const s = (seconds % 60).toString().padStart(2, "0");
+    return `${m}:${s}`;
+  };
 
-  const renderQuiz = () => (
-    <div className="quiz-container">
-      <div className="quiz-header">
-        <h2>
-          Question {currentQuestion + 1} of {questions.length}
-        </h2>
-        {mode === "test" && (
-          <div className="timer">
-            ⏱ {Math.floor((Date.now() - startTime) / 1000)}s
-          </div>
-        )}
-        <div className="progress">
-          <div
-            className="progress-bar"
-            style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
-          />
+  if (mode === "landing") {
+    return (
+      <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ textAlign: "center", padding: 40 }}>
+        <h1>Scrum Master Practice Quiz 2025</h1>
+        <p>Designed by <strong>John Clohessy</strong> • Not affiliated with Scrum.org</p>
+        <p>This free quiz is designed to help you prepare for the PSM I certification and reinforce key Scrum concepts.</p>
+        <p style={{ fontSize: "0.9rem", color: "gray" }}>
+          It is an independent study tool created by an experienced Scrum Master and Agile Coach. It is not affiliated with Scrum.org or any certification body.
+        </p>
+        <div style={{ marginTop: 30 }}>
+          <button onClick={() => setMode("practice")} className="primary-btn">Start Quiz</button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ maxWidth: 800, margin: "auto", padding: 20 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h2>Scrum Master Practice Quiz 2025</h2>
+        <div>
+          <button onClick={() => setMode("practice")} style={{ marginRight: 10 }}>Practice Mode</button>
+          <button onClick={() => { resetQuiz(); setMode("test"); }}>Test Mode</button>
+          <button onClick={() => setDarkMode(!darkMode)} style={{ marginLeft: 10 }}>
+            {darkMode ? "☀ Light Mode" : "🌙 Dark Mode"}
+          </button>
         </div>
       </div>
 
-      <h3>{questions[currentQuestion].question}</h3>
+      {mode === "test" && !quizCompleted && (
+        <div style={{ textAlign: "right", fontSize: "1.1rem", marginBottom: 10 }}>
+          Timer: <strong>{formatTime(timer)}</strong>
+        </div>
+      )}
 
-      {questions[currentQuestion].options.map((option, index) => {
-        const label = getOptionLabel(index);
-        const isCorrect = index === questions[currentQuestion].correct;
-        const isSelected = selectedOption === index;
-        let bgColor = "#eee";
+      <div style={{ marginBottom: 10 }}>Question {currentQuestion + 1} of {questions.length}</div>
 
-        if (selectedOption !== null) {
-          if (isSelected && isCorrect) bgColor = "#d4edda";
-          else if (isSelected && !isCorrect) bgColor = "#f8d7da";
-          else if (isCorrect) bgColor = "#d4edda";
-        }
+      <div style={{ backgroundColor: "#eee", height: 6, marginBottom: 20 }}>
+        <div style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%`, height: "100%", backgroundColor: "dodgerblue" }}></div>
+      </div>
 
-        return (
-          <button
-            key={index}
-            onClick={() => handleAnswer(index)}
-            style={{
-              backgroundColor: bgColor,
-              padding: "12px",
-              margin: "10px 0",
-              width: "100%",
-              textAlign: "left",
-              fontWeight: isSelected ? "bold" : "normal",
-              border: "1px solid #ccc",
-              borderRadius: "5px",
-              fontSize: "16px"
-            }}
-          >
-            <strong>{label}.</strong> {option}
-          </button>
-        );
-      })}
+      {!quizCompleted ? (
+        <div>
+          <h3 style={{ fontSize: "1.2rem" }}><strong>{questions[currentQuestion].question}</strong></h3>
+          {questions[currentQuestion].options.map((option, index) => {
+            const optionLabel = String.fromCharCode(65 + index); // A, B, C, D
+            const isSelected = selectedOption === index;
+            const isCorrect = index === questions[currentQuestion].correct;
+            let bg = "";
+            if (showExplanation && isSelected) {
+              bg = isCorrect ? "lightgreen" : "salmon";
+            }
+            return (
+              <button
+                key={index}
+                onClick={() => handleAnswer(index)}
+                style={{
+                  display: "block",
+                  margin: "10px 0",
+                  padding: "10px 15px",
+                  width: "100%",
+                  textAlign: "left",
+                  backgroundColor: bg,
+                  border: "1px solid #ccc",
+                  fontSize: "1rem"
+                }}
+                disabled={showExplanation}
+              >
+                <strong>{optionLabel}.</strong> {option}
+              </button>
+            );
+          })}
 
-      {showExplanation && (
-        <div style={{ marginTop: 20, background: "#f1f1f1", padding: 20 }}>
-          <p>
-            <strong>
-              {selectedOption === questions[currentQuestion].correct ? "✅ Correct!" : "❌ Incorrect!"}
-            </strong>
-          </p>
-          <p>
-            <strong>Explanation:</strong> {questions[currentQuestion].explanation}
-          </p>
-          <button onClick={nextQuestion}>Next</button>
+          {showExplanation && (
+            <div style={{ backgroundColor: "#f1f1f1", padding: 20, marginTop: 20 }}>
+              <p>
+                <strong>{selectedOption === questions[currentQuestion].correct ? "✅ Correct!" : "❌ Incorrect!"}</strong> {questions[currentQuestion].explanation}
+              </p>
+              <button onClick={nextQuestion}>Next</button>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div style={{ textAlign: "center" }}>
+          <h2>Quiz Completed!</h2>
+          <p>✅ Correct Answers: {correctAnswers}</p>
+          <p>❌ Incorrect Answers: {incorrectAnswers}</p>
+          <button onClick={resetQuiz}>Restart Quiz</button>
         </div>
       )}
     </div>
   );
-
-  const renderCompletion = () => (
-    <div className="completion">
-      <h2>✅ Quiz Completed</h2>
-      <p>Correct: {correctAnswers}</p>
-      <p>Incorrect: {incorrectAnswers}</p>
-      <button onClick={() => window.location.reload()}>Restart</button>
-    </div>
-  );
-
-  return (
-    <div className={darkMode ? "dark" : "light"} style={{ padding: 20, fontFamily: "Arial" }}>
-      {!mode ? renderLandingPage() : quizCompleted ? renderCompletion() : renderQuiz()}
-    </div>
-  );
 }
-
-
-
