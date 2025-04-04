@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { questions } from "./questions";
+import { questions as originalQuestions } from "./questions";
 import "./App.css";
 
 export default function App() {
   const [mode, setMode] = useState("landing");
+  const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [showExplanation, setShowExplanation] = useState(false);
@@ -12,19 +13,22 @@ export default function App() {
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [timer, setTimer] = useState(60 * 30); // 30 minutes
-  const [studyTip, setStudyTip] = useState("");
-
+  const [answers, setAnswers] = useState([]);
   const tips = [
-    "🧠 Remember: The Scrum Master is a servant-leader, not a manager.",
-    "📌 Daily Scrum is for Developers to inspect progress toward the Sprint Goal.",
-    "✅ The Definition of Done creates shared understanding.",
-    "🔄 The Product Backlog is a living artifact — it evolves constantly.",
-    "🏁 The Sprint Goal gives direction to the team for each Sprint.",
-    "🙋‍♂️ Only the Product Owner can cancel a Sprint.",
-    "📊 Scrum is built on transparency, inspection, and adaptation.",
-    "🔁 Retrospectives are for continuous improvement, not blame.",
-    "📚 Developers define the Definition of Done — not stakeholders."
+    "The Definition of Done creates shared understanding.",
+    "Scrum thrives on empiricism: transparency, inspection, and adaptation.",
+    "The Product Owner manages the Product Backlog.",
+    "Daily Scrums are for the Developers to inspect and adapt.",
+    "Sprint Retrospective fosters continuous improvement."
   ];
+  const [randomTip, setRandomTip] = useState(tips[0]);
+
+  useEffect(() => {
+    if (mode !== "landing") {
+      const shuffled = [...originalQuestions].sort(() => Math.random() - 0.5);
+      setQuestions(shuffled);
+    }
+  }, [mode]);
 
   useEffect(() => {
     let interval;
@@ -46,14 +50,24 @@ export default function App() {
   const handleAnswer = (index) => {
     setSelectedOption(index);
     setShowExplanation(true);
-    if (index === questions[currentQuestion].correct) {
-      setCorrectAnswers((prev) => prev + 1);
-    } else {
-      setIncorrectAnswers((prev) => prev + 1);
-    }
+    const isCorrect = index === questions[currentQuestion].correct;
+    if (isCorrect) setCorrectAnswers((prev) => prev + 1);
+    else setIncorrectAnswers((prev) => prev + 1);
 
-    const randomTip = tips[Math.floor(Math.random() * tips.length)];
-    setStudyTip(randomTip);
+    setAnswers((prev) => [
+      ...prev,
+      {
+        question: questions[currentQuestion].question,
+        selected: index,
+        correct: questions[currentQuestion].correct,
+        explanation: questions[currentQuestion].explanation,
+        options: questions[currentQuestion].options
+      }
+    ]);
+
+    // Shuffle tip
+    const nextTip = tips[Math.floor(Math.random() * tips.length)];
+    setRandomTip(nextTip);
   };
 
   const nextQuestion = () => {
@@ -61,7 +75,6 @@ export default function App() {
       setSelectedOption(null);
       setShowExplanation(false);
       setCurrentQuestion((prev) => prev + 1);
-      setStudyTip(""); // clear until next answer
     } else {
       setQuizCompleted(true);
     }
@@ -75,7 +88,7 @@ export default function App() {
     setIncorrectAnswers(0);
     setQuizCompleted(false);
     setTimer(60 * 30);
-    setStudyTip("");
+    setAnswers([]);
   };
 
   const formatTime = (seconds) => {
@@ -84,7 +97,7 @@ export default function App() {
     return `${m}:${s}`;
   };
 
-  const score = Math.round((correctAnswers / questions.length) * 100);
+  const percentage = Math.round((correctAnswers / questions.length) * 100);
 
   if (mode === "landing") {
     return (
@@ -93,7 +106,7 @@ export default function App() {
         <p>Designed by <strong>John Clohessy</strong> • Not affiliated with Scrum.org</p>
         <p>This free quiz is designed to help you prepare for the PSM I certification and reinforce key Scrum concepts.</p>
         <p style={{ fontSize: "0.9rem", color: "gray" }}>
-          It is an independent study tool created by an experienced Scrum Master and Agile Coach.
+          It is an independent study tool created by an experienced Scrum Master and Agile Coach. It is not affiliated with Scrum.org or any certification body.
         </p>
         <div style={{ marginTop: 30 }}>
           <button onClick={() => setMode("practice")} className="primary-btn">Start Quiz</button>
@@ -162,17 +175,11 @@ export default function App() {
           {showExplanation && (
             <div className="explanation-box">
               <p>
-                <strong>{selectedOption === questions[currentQuestion].correct ? "✅ Correct!" : "❌ Incorrect!"}</strong>{" "}
-                {questions[currentQuestion].explanation}
+                <strong>{selectedOption === questions[currentQuestion].correct ? "✅ Correct!" : "❌ Incorrect!"}</strong> {questions[currentQuestion].explanation}
               </p>
-
-              {studyTip && (
-                <p style={{ marginTop: 20, fontStyle: "italic", borderTop: "1px solid #ccc", paddingTop: 10 }}>
-                  💡 <strong>Tip:</strong> {studyTip}
-                </p>
-              )}
-
-              <button onClick={nextQuestion} style={{ marginTop: 10 }}>Next</button>
+              <hr />
+              <p><span role="img" aria-label="tip">💡</span> <strong>Tip:</strong> ✅ <em>{randomTip}</em></p>
+              <button onClick={nextQuestion}>Next</button>
             </div>
           )}
         </div>
@@ -181,15 +188,31 @@ export default function App() {
           <h2>✅ Quiz Completed!</h2>
           <p>✅ Correct Answers: {correctAnswers}</p>
           <p>❌ Incorrect Answers: {incorrectAnswers}</p>
-          <p><strong>Your Score: {score}%</strong></p>
-          {score >= 85 ? (
-            <p style={{ color: "green", fontWeight: "bold" }}>🎉 You passed with flying colors!</p>
+          <p><strong>Your Score: {percentage}%</strong></p>
+          {percentage >= 85 ? (
+            <p style={{ color: "green" }}>⭐ You passed the quiz!</p>
           ) : (
-            <p style={{ color: "crimson", fontWeight: "bold" }}>❗ Keep practicing to reach 85%.</p>
+            <p style={{ color: "crimson" }}>❗ Keep practicing to reach 85%.</p>
           )}
+
+          <h3 style={{ textAlign: "left", marginTop: 40 }}>🔹 Review Answers
+          </h3>
+          {answers.map((ans, idx) => (
+            <div key={idx} style={{ textAlign: "left", marginBottom: 20 }}>
+              <p><strong>Q{idx + 1}:</strong> {ans.question}</p>
+              <p>Your answer: <strong>{String.fromCharCode(65 + ans.selected)}. {ans.options[ans.selected]}</strong></p>
+              <p>Correct answer: <strong>{String.fromCharCode(65 + ans.correct)}. {ans.options[ans.correct]}</strong></p>
+              <p style={{ color: ans.selected === ans.correct ? "green" : "crimson" }}>
+                {ans.selected === ans.correct ? "✅ Correct" : "❌ Incorrect"}
+              </p>
+              <p><em>{ans.explanation}</em></p>
+              <hr />
+            </div>
+          ))}
           <button onClick={resetQuiz}>Restart Quiz</button>
         </div>
       )}
     </div>
   );
 }
+
