@@ -11,7 +11,7 @@ export default function App() {
   const [incorrectAnswers, setIncorrectAnswers] = useState(0);
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
-  const [timer, setTimer] = useState(60 * 20); // 20 minutes
+  const [timer, setTimer] = useState(60 * 30); // ⚡ Changed: 30 minutes (1800s)
 
   useEffect(() => {
     let interval;
@@ -57,7 +57,7 @@ export default function App() {
     setCorrectAnswers(0);
     setIncorrectAnswers(0);
     setQuizCompleted(false);
-    setTimer(60 * 20);
+    setTimer(60 * 30); // ⚡ Reset to 30 min
   };
 
   const formatTime = (seconds) => {
@@ -66,44 +66,16 @@ export default function App() {
     return `${m}:${s}`;
   };
 
-  const containerStyle = {
-    maxWidth: 900,
-    margin: "auto",
-    padding: 30,
-    backgroundColor: darkMode ? "#1e1e1e" : "#ffffff",
-    color: darkMode ? "#f1f1f1" : "#222",
-    borderRadius: 10,
-    boxShadow: "0 0 10px rgba(0,0,0,0.1)"
-  };
-
-  const buttonStyle = {
-    display: "block",
-    margin: "10px 0",
-    padding: "12px 16px",
-    width: "100%",
-    textAlign: "left",
-    backgroundColor: "#f9f9f9",
-    border: "1px solid #ccc",
-    borderRadius: 6,
-    fontSize: "1rem",
-    cursor: "pointer"
-  };
-
-  const explanationBox = {
-    backgroundColor: darkMode ? "#333" : "#f1f1f1",
-    padding: 20,
-    marginTop: 20,
-    borderRadius: 6
-  };
+  const passed = (correctAnswers / questions.length) >= 0.85;
 
   if (mode === "landing") {
     return (
       <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ textAlign: "center", padding: 40 }}>
-        <h1 style={{ fontSize: "2.4rem" }}>Scrum Master Practice Quiz 2025</h1>
+        <h1>Scrum Master Practice Quiz 2025</h1>
         <p>Designed by <strong>John Clohessy</strong> • Not affiliated with Scrum.org</p>
         <p>This free quiz is designed to help you prepare for the PSM I certification and reinforce key Scrum concepts.</p>
         <p style={{ fontSize: "0.9rem", color: "gray" }}>
-          It is an independent study tool created by an experienced Scrum Master and Agile Coach. It is not affiliated with Scrum.org or any certification body.
+          It is an independent study tool created by an experienced Scrum Master and Agile Coach.
         </p>
         <div style={{ marginTop: 30 }}>
           <button onClick={() => setMode("practice")} className="primary-btn">Start Quiz</button>
@@ -113,8 +85,8 @@ export default function App() {
   }
 
   return (
-    <div className={`app-container ${darkMode ? "dark" : ""}`} style={containerStyle}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+    <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ maxWidth: 800, margin: "auto", padding: 20 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h2>Scrum Master Practice Quiz 2025</h2>
         <div>
           <button onClick={() => setMode("practice")} style={{ marginRight: 10 }}>Practice Mode</button>
@@ -132,14 +104,13 @@ export default function App() {
       )}
 
       <div style={{ marginBottom: 10 }}>Question {currentQuestion + 1} of {questions.length}</div>
-
-      <div style={{ backgroundColor: "#ddd", height: 6, marginBottom: 20, borderRadius: 3 }}>
-        <div style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%`, height: "100%", backgroundColor: "dodgerblue", borderRadius: 3 }}></div>
+      <div style={{ backgroundColor: "#eee", height: 6, marginBottom: 20 }}>
+        <div style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%`, height: "100%", backgroundColor: "dodgerblue" }}></div>
       </div>
 
       {!quizCompleted ? (
         <div>
-          <h3 style={{ fontSize: "1.2rem", marginBottom: 20 }}>{questions[currentQuestion].question}</h3>
+          <h3 style={{ fontSize: "1.2rem" }}><strong>{questions[currentQuestion].question}</strong></h3>
           {questions[currentQuestion].options.map((option, index) => {
             const optionLabel = String.fromCharCode(65 + index);
             const isSelected = selectedOption === index;
@@ -153,8 +124,14 @@ export default function App() {
                 key={index}
                 onClick={() => handleAnswer(index)}
                 style={{
-                  ...buttonStyle,
-                  backgroundColor: bg || buttonStyle.backgroundColor
+                  display: "block",
+                  margin: "10px 0",
+                  padding: "10px 15px",
+                  width: "100%",
+                  textAlign: "left",
+                  backgroundColor: bg,
+                  border: "1px solid #ccc",
+                  fontSize: "1rem"
                 }}
                 disabled={showExplanation}
               >
@@ -164,11 +141,11 @@ export default function App() {
           })}
 
           {showExplanation && (
-            <div style={explanationBox}>
+            <div style={{ backgroundColor: "#f1f1f1", padding: 20, marginTop: 20 }}>
               <p>
                 <strong>{selectedOption === questions[currentQuestion].correct ? "✅ Correct!" : "❌ Incorrect!"}</strong> {questions[currentQuestion].explanation}
               </p>
-              <button onClick={nextQuestion} style={{ marginTop: 10 }}>Next</button>
+              <button onClick={nextQuestion}>Next</button>
             </div>
           )}
         </div>
@@ -177,10 +154,14 @@ export default function App() {
           <h2>Quiz Completed!</h2>
           <p>✅ Correct Answers: {correctAnswers}</p>
           <p>❌ Incorrect Answers: {incorrectAnswers}</p>
+          {mode === "test" && (
+            <p style={{ fontSize: "1.1rem", fontWeight: "bold", color: passed ? "green" : "red" }}>
+              {passed ? "🎉 Congratulations! You passed." : "❌ You did not reach the 85% threshold."}
+            </p>
+          )}
           <button onClick={resetQuiz}>Restart Quiz</button>
         </div>
       )}
     </div>
   );
 }
-
