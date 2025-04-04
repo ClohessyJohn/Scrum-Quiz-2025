@@ -1,34 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { questions } from "./questions";
 
 export default function App() {
-  const [mode, setMode] = useState(null); // 'practice' or 'test'
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [showExplanation, setShowExplanation] = useState(false);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [incorrectAnswers, setIncorrectAnswers] = useState(0);
   const [quizCompleted, setQuizCompleted] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(2400); // 40 minutes in seconds
+  const [mode, setMode] = useState(null); // null, "practice", or "test"
+  const [darkMode, setDarkMode] = useState(false);
+  const [startTime, setStartTime] = useState(null);
 
-  useEffect(() => {
-    if (mode === "test" && !quizCompleted) {
-      const timer = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            setQuizCompleted(true);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-      return () => clearInterval(timer);
-    }
-  }, [mode, quizCompleted]);
+  const handleStart = (selectedMode) => {
+    setMode(selectedMode);
+    setStartTime(selectedMode === "test" ? Date.now() : null);
+  };
 
   const handleAnswer = (index) => {
-    if (selectedOption !== null) return;
+    if (selectedOption !== null) return; // prevent multiple clicks
     setSelectedOption(index);
     setShowExplanation(true);
     if (index === questions[currentQuestion].correct) {
@@ -48,111 +38,105 @@ export default function App() {
     }
   };
 
-  const startQuiz = (selectedMode) => {
-    setMode(selectedMode);
-    setCurrentQuestion(0);
-    setCorrectAnswers(0);
-    setIncorrectAnswers(0);
-    setSelectedOption(null);
-    setQuizCompleted(false);
-    setTimeLeft(2400);
-  };
+  const getOptionLabel = (i) => String.fromCharCode(65 + i); // A, B, C, D
 
-  const formatTime = (secs) => {
-    const min = Math.floor(secs / 60);
-    const sec = secs % 60;
-    return `${min}:${sec < 10 ? "0" : ""}${sec}`;
-  };
+  const renderLandingPage = () => (
+    <div className="landing">
+      <h1>Scrum Master Practice Quiz 2025</h1>
+      <p>Study for your Scrum.org PSM I exam — built by <strong>John Clohessy</strong></p>
+      <button onClick={() => handleStart("practice")}>Practice Mode</button>
+      <button onClick={() => handleStart("test")}>Test Mode</button>
+      <button onClick={() => setDarkMode(!darkMode)}>
+        {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
+      </button>
+    </div>
+  );
 
-  if (!mode) {
-    return (
-      <div style={{ padding: 30, textAlign: "center" }}>
-        <h1>Scrum Master Quiz 2025</h1>
-        <p>
-          This free quiz is based on the latest Scrum Guide and designed to help
-          Agile professionals study for the PSM I exam.
-        </p>
-        <p><strong>Note:</strong> This site is not affiliated with Scrum.org.</p>
-        <button onClick={() => startQuiz("practice")}>Practice Mode</button>
-        <button onClick={() => startQuiz("test")} style={{ marginLeft: 10 }}>
-          Test Mode
-        </button>
-      </div>
-    );
-  }
-
-  if (quizCompleted) {
-    return (
-      <div style={{ padding: 30, textAlign: "center" }}>
-        <h2>✅ Quiz Completed!</h2>
-        <p>Correct: {correctAnswers}</p>
-        <p>Incorrect: {incorrectAnswers}</p>
-        <button onClick={() => setMode(null)}>Back to Start</button>
-      </div>
-    );
-  }
-
-  const letters = ["A", "B", "C", "D"];
-
-  return (
-    <div style={{ padding: 30, maxWidth: 800, margin: "auto" }}>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h3>
+  const renderQuiz = () => (
+    <div className="quiz-container">
+      <div className="quiz-header">
+        <h2>
           Question {currentQuestion + 1} of {questions.length}
-        </h3>
-        {mode === "test" && <h3>⏱️ {formatTime(timeLeft)}</h3>}
+        </h2>
+        {mode === "test" && (
+          <div className="timer">
+            ⏱ {Math.floor((Date.now() - startTime) / 1000)}s
+          </div>
+        )}
+        <div className="progress">
+          <div
+            className="progress-bar"
+            style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
+          />
+        </div>
       </div>
 
-      <h2>{questions[currentQuestion].question}</h2>
+      <h3>{questions[currentQuestion].question}</h3>
+
       {questions[currentQuestion].options.map((option, index) => {
+        const label = getOptionLabel(index);
         const isCorrect = index === questions[currentQuestion].correct;
         const isSelected = selectedOption === index;
+        let bgColor = "#eee";
 
-        const backgroundColor =
-          selectedOption !== null && isSelected
-            ? isCorrect
-              ? "lightgreen"
-              : "salmon"
-            : "#f0f0f0";
+        if (selectedOption !== null) {
+          if (isSelected && isCorrect) bgColor = "#d4edda";
+          else if (isSelected && !isCorrect) bgColor = "#f8d7da";
+          else if (isCorrect) bgColor = "#d4edda";
+        }
 
         return (
           <button
             key={index}
             onClick={() => handleAnswer(index)}
             style={{
-              display: "block",
+              backgroundColor: bgColor,
+              padding: "12px",
+              margin: "10px 0",
               width: "100%",
-              marginBottom: 10,
-              padding: "10px 20px",
-              backgroundColor,
-              border: "1px solid #ccc",
-              borderRadius: 4,
               textAlign: "left",
-              fontSize: 16,
-              fontWeight: "normal"
+              fontWeight: isSelected ? "bold" : "normal",
+              border: "1px solid #ccc",
+              borderRadius: "5px",
+              fontSize: "16px"
             }}
           >
-            <strong>{letters[index]}.</strong> {option}
+            <strong>{label}.</strong> {option}
           </button>
         );
       })}
 
-      {mode === "practice" && showExplanation && (
-        <div style={{ marginTop: 20, backgroundColor: "#eee", padding: 20 }}>
+      {showExplanation && (
+        <div style={{ marginTop: 20, background: "#f1f1f1", padding: 20 }}>
           <p>
-            <strong>Explanation: </strong>
-            {questions[currentQuestion].explanation}
+            <strong>
+              {selectedOption === questions[currentQuestion].correct ? "✅ Correct!" : "❌ Incorrect!"}
+            </strong>
           </p>
+          <p>
+            <strong>Explanation:</strong> {questions[currentQuestion].explanation}
+          </p>
+          <button onClick={nextQuestion}>Next</button>
         </div>
       )}
+    </div>
+  );
 
-      {showExplanation || mode === "test" ? (
-        <button onClick={nextQuestion} style={{ marginTop: 20 }}>
-          {currentQuestion < questions.length - 1 ? "Next" : "Finish"}
-        </button>
-      ) : null}
+  const renderCompletion = () => (
+    <div className="completion">
+      <h2>✅ Quiz Completed</h2>
+      <p>Correct: {correctAnswers}</p>
+      <p>Incorrect: {incorrectAnswers}</p>
+      <button onClick={() => window.location.reload()}>Restart</button>
+    </div>
+  );
+
+  return (
+    <div className={darkMode ? "dark" : "light"} style={{ padding: 20, fontFamily: "Arial" }}>
+      {!mode ? renderLandingPage() : quizCompleted ? renderCompletion() : renderQuiz()}
     </div>
   );
 }
+
 
 
