@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { questions as originalQuestions } from "./questions";
+import { questions } from "./questions";
 import "./App.css";
 
 export default function App() {
   const [mode, setMode] = useState("landing");
-  const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [showExplanation, setShowExplanation] = useState(false);
@@ -13,16 +12,6 @@ export default function App() {
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [timer, setTimer] = useState(60 * 30); // 30 minutes
-  const [reviewMode, setReviewMode] = useState(false);
-  const [answers, setAnswers] = useState([]);
-
-  // Shuffle questions once at the beginning of quiz
-  const startQuiz = (selectedMode) => {
-    const shuffled = [...originalQuestions].sort(() => 0.5 - Math.random());
-    setQuestions(shuffled);
-    setMode(selectedMode);
-    resetQuiz(shuffled);
-  };
 
   useEffect(() => {
     let interval;
@@ -32,7 +21,6 @@ export default function App() {
           if (prev <= 1) {
             clearInterval(interval);
             setQuizCompleted(true);
-            setReviewMode(true);
             return 0;
           }
           return prev - 1;
@@ -45,24 +33,11 @@ export default function App() {
   const handleAnswer = (index) => {
     setSelectedOption(index);
     setShowExplanation(true);
-
-    const isCorrect = index === questions[currentQuestion].correct;
-    if (isCorrect) {
+    if (index === questions[currentQuestion].correct) {
       setCorrectAnswers((prev) => prev + 1);
     } else {
       setIncorrectAnswers((prev) => prev + 1);
     }
-
-    setAnswers((prev) => [
-      ...prev,
-      {
-        question: questions[currentQuestion].question,
-        selected: index,
-        correct: questions[currentQuestion].correct,
-        options: questions[currentQuestion].options,
-        explanation: questions[currentQuestion].explanation,
-      },
-    ]);
   };
 
   const nextQuestion = () => {
@@ -72,21 +47,17 @@ export default function App() {
       setCurrentQuestion((prev) => prev + 1);
     } else {
       setQuizCompleted(true);
-      setReviewMode(true);
     }
   };
 
-  const resetQuiz = (shuffled = originalQuestions) => {
+  const resetQuiz = () => {
     setCurrentQuestion(0);
     setSelectedOption(null);
     setShowExplanation(false);
     setCorrectAnswers(0);
     setIncorrectAnswers(0);
     setQuizCompleted(false);
-    setReviewMode(false);
     setTimer(60 * 30);
-    setAnswers([]);
-    setQuestions(shuffled);
   };
 
   const formatTime = (seconds) => {
@@ -102,11 +73,10 @@ export default function App() {
         <p>Designed by <strong>John Clohessy</strong> • Not affiliated with Scrum.org</p>
         <p>This free quiz is designed to help you prepare for the PSM I certification and reinforce key Scrum concepts.</p>
         <p style={{ fontSize: "0.9rem", color: "gray" }}>
-          It is an independent study tool created by an experienced Scrum Master and Agile Coach.
+          It is an independent study tool created by an experienced Scrum Master and Agile Coach. It is not affiliated with Scrum.org or any certification body.
         </p>
         <div style={{ marginTop: 30 }}>
-          <button onClick={() => startQuiz("practice")} className="primary-btn">Start Practice Mode</button>
-          <button onClick={() => startQuiz("test")} className="primary-btn" style={{ marginLeft: 10 }}>Start Test Mode</button>
+          <button onClick={() => setMode("practice")} className="primary-btn">Start Quiz</button>
         </div>
       </div>
     );
@@ -117,8 +87,8 @@ export default function App() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h2>Scrum Master Practice Quiz 2025</h2>
         <div>
-          <button onClick={() => startQuiz("practice")} style={{ marginRight: 10 }}>Practice Mode</button>
-          <button onClick={() => startQuiz("test")}>Test Mode</button>
+          <button onClick={() => setMode("practice")} style={{ marginRight: 10 }}>Practice Mode</button>
+          <button onClick={() => { resetQuiz(); setMode("test"); }}>Test Mode</button>
           <button onClick={() => setDarkMode(!darkMode)} style={{ marginLeft: 10 }}>
             {darkMode ? "☀ Light Mode" : "🌙 Dark Mode"}
           </button>
@@ -137,7 +107,7 @@ export default function App() {
         <div style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%`, height: "100%", backgroundColor: "dodgerblue" }}></div>
       </div>
 
-      {!quizCompleted && questions[currentQuestion] && (
+      {!quizCompleted ? (
         <div>
           <h3 style={{ fontSize: "1.2rem" }}><strong>{questions[currentQuestion].question}</strong></h3>
           {questions[currentQuestion].options.map((option, index) => {
@@ -178,32 +148,22 @@ export default function App() {
             </div>
           )}
         </div>
-      )}
-
-      {reviewMode && quizCompleted && (
-        <div style={{ marginTop: 40 }}>
+      ) : (
+        <div style={{ textAlign: "center" }}>
           <h2>✅ Quiz Completed!</h2>
-          <p>Correct: {correctAnswers} / {questions.length}</p>
-          <p style={{ fontWeight: "bold" }}>
-            {correctAnswers / questions.length >= 0.85 ? "🎉 You passed!" : "❗ Keep practicing to reach 85%."}
-          </p>
-          <h3 style={{ marginTop: 30 }}>📘 Review Answers</h3>
-          {answers.map((ans, index) => {
-            const isCorrect = ans.selected === ans.correct;
-            return (
-              <div key={index} style={{ borderBottom: "1px solid #ccc", padding: "10px 0" }}>
-                <p><strong>Q{index + 1}:</strong> {ans.question}</p>
-                <p>Your answer: <strong>{String.fromCharCode(65 + ans.selected)}. {ans.options[ans.selected]}</strong></p>
-                <p>Correct answer: <strong>{String.fromCharCode(65 + ans.correct)}. {ans.options[ans.correct]}</strong></p>
-                <p>{isCorrect ? "✅ Correct" : "❌ Incorrect"}</p>
-                <p><em>{ans.explanation}</em></p>
-              </div>
-            );
-          })}
-          <button onClick={() => startQuiz(mode)} style={{ marginTop: 20 }}>Restart</button>
+          <p>✅ Correct Answers: {correctAnswers}</p>
+          <p>❌ Incorrect Answers: {incorrectAnswers}</p>
+          <h3 style={{ marginTop: "1rem" }}>
+            Your Score: {Math.round((correctAnswers / questions.length) * 100)}%
+          </h3>
+          {correctAnswers / questions.length >= 0.85 ? (
+            <p style={{ color: "green", fontWeight: "bold" }}>🎉 Congratulations! You passed the quiz.</p>
+          ) : (
+            <p style={{ color: "crimson", fontWeight: "bold" }}>❗ Keep practicing to reach 85%.</p>
+          )}
+          <button onClick={resetQuiz} style={{ marginTop: 20 }}>Restart Quiz</button>
         </div>
       )}
     </div>
   );
 }
-
