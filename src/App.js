@@ -66,10 +66,40 @@ export default function App() {
     return `${m}:${s}`;
   };
 
+  const containerStyle = {
+    maxWidth: 900,
+    margin: "auto",
+    padding: 30,
+    backgroundColor: darkMode ? "#1e1e1e" : "#ffffff",
+    color: darkMode ? "#f1f1f1" : "#222",
+    borderRadius: 10,
+    boxShadow: "0 0 10px rgba(0,0,0,0.1)"
+  };
+
+  const buttonStyle = {
+    display: "block",
+    margin: "10px 0",
+    padding: "12px 16px",
+    width: "100%",
+    textAlign: "left",
+    backgroundColor: "#f9f9f9",
+    border: "1px solid #ccc",
+    borderRadius: 6,
+    fontSize: "1rem",
+    cursor: "pointer"
+  };
+
+  const explanationBox = {
+    backgroundColor: darkMode ? "#333" : "#f1f1f1",
+    padding: 20,
+    marginTop: 20,
+    borderRadius: 6
+  };
+
   if (mode === "landing") {
     return (
       <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ textAlign: "center", padding: 40 }}>
-        <h1>Scrum Master Practice Quiz 2025</h1>
+        <h1 style={{ fontSize: "2.4rem" }}>Scrum Master Practice Quiz 2025</h1>
         <p>Designed by <strong>John Clohessy</strong> • Not affiliated with Scrum.org</p>
         <p>This free quiz is designed to help you prepare for the PSM I certification and reinforce key Scrum concepts.</p>
         <p style={{ fontSize: "0.9rem", color: "gray" }}>
@@ -83,8 +113,8 @@ export default function App() {
   }
 
   return (
-    <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ maxWidth: 800, margin: "auto", padding: 20 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+    <div className={`app-container ${darkMode ? "dark" : ""}`} style={containerStyle}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
         <h2>Scrum Master Practice Quiz 2025</h2>
         <div>
           <button onClick={() => setMode("practice")} style={{ marginRight: 10 }}>Practice Mode</button>
@@ -103,15 +133,15 @@ export default function App() {
 
       <div style={{ marginBottom: 10 }}>Question {currentQuestion + 1} of {questions.length}</div>
 
-      <div style={{ backgroundColor: "#eee", height: 6, marginBottom: 20 }}>
-        <div style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%`, height: "100%", backgroundColor: "dodgerblue" }}></div>
+      <div style={{ backgroundColor: "#ddd", height: 6, marginBottom: 20, borderRadius: 3 }}>
+        <div style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%`, height: "100%", backgroundColor: "dodgerblue", borderRadius: 3 }}></div>
       </div>
 
       {!quizCompleted ? (
         <div>
-          <h3 style={{ fontSize: "1.2rem" }}><strong>{questions[currentQuestion].question}</strong></h3>
+          <h3 style={{ fontSize: "1.2rem", marginBottom: 20 }}>{questions[currentQuestion].question}</h3>
           {questions[currentQuestion].options.map((option, index) => {
-            const optionLabel = String.fromCharCode(65 + index); // A, B, C, D
+            const optionLabel = String.fromCharCode(65 + index);
             const isSelected = selectedOption === index;
             const isCorrect = index === questions[currentQuestion].correct;
             let bg = "";
@@ -123,14 +153,8 @@ export default function App() {
                 key={index}
                 onClick={() => handleAnswer(index)}
                 style={{
-                  display: "block",
-                  margin: "10px 0",
-                  padding: "10px 15px",
-                  width: "100%",
-                  textAlign: "left",
-                  backgroundColor: bg,
-                  border: "1px solid #ccc",
-                  fontSize: "1rem"
+                  ...buttonStyle,
+                  backgroundColor: bg || buttonStyle.backgroundColor
                 }}
                 disabled={showExplanation}
               >
@@ -140,11 +164,11 @@ export default function App() {
           })}
 
           {showExplanation && (
-            <div style={{ backgroundColor: "#f1f1f1", padding: 20, marginTop: 20 }}>
+            <div style={explanationBox}>
               <p>
                 <strong>{selectedOption === questions[currentQuestion].correct ? "✅ Correct!" : "❌ Incorrect!"}</strong> {questions[currentQuestion].explanation}
               </p>
-              <button onClick={nextQuestion}>Next</button>
+              <button onClick={nextQuestion} style={{ marginTop: 10 }}>Next</button>
             </div>
           )}
         </div>
@@ -159,3 +183,4 @@ export default function App() {
     </div>
   );
 }
+
