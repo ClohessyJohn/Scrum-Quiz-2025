@@ -14,6 +14,7 @@ export default function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [timer, setTimer] = useState(60 * 30); // 30 minutes
   const [answers, setAnswers] = useState([]);
+
   const tips = [
     "The Definition of Done creates shared understanding.",
     "Scrum thrives on empiricism: transparency, inspection, and adaptation.",
@@ -65,7 +66,6 @@ export default function App() {
       }
     ]);
 
-    // Shuffle tip
     const nextTip = tips[Math.floor(Math.random() * tips.length)];
     setRandomTip(nextTip);
   };
@@ -115,6 +115,14 @@ export default function App() {
     );
   }
 
+  if (mode !== "landing" && questions.length === 0) {
+    return (
+      <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ padding: 40 }}>
+        <h2>Loading questions...</h2>
+      </div>
+    );
+  }
+
   return (
     <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ maxWidth: 800, margin: "auto", padding: 20 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -140,7 +148,7 @@ export default function App() {
         <div style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%`, height: "100%", backgroundColor: "dodgerblue" }}></div>
       </div>
 
-      {!quizCompleted ? (
+      {!quizCompleted && questions.length > 0 ? (
         <div>
           <h3 style={{ fontSize: "1.2rem" }}><strong>{questions[currentQuestion].question}</strong></h3>
           {questions[currentQuestion].options.map((option, index) => {
@@ -195,8 +203,7 @@ export default function App() {
             <p style={{ color: "crimson" }}>❗ Keep practicing to reach 85%.</p>
           )}
 
-          <h3 style={{ textAlign: "left", marginTop: 40 }}>🔹 Review Answers
-          </h3>
+          <h3 style={{ textAlign: "left", marginTop: 40 }}>🔹 Review Answers</h3>
           {answers.map((ans, idx) => (
             <div key={idx} style={{ textAlign: "left", marginBottom: 20 }}>
               <p><strong>Q{idx + 1}:</strong> {ans.question}</p>
@@ -215,4 +222,5 @@ export default function App() {
     </div>
   );
 }
+
 
