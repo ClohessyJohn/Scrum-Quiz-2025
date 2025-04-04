@@ -57,7 +57,7 @@ export default function App() {
     setCorrectAnswers(0);
     setIncorrectAnswers(0);
     setQuizCompleted(false);
-    setTimer(60 * 20);
+    setTimer(60 * 30);
   };
 
   const formatTime = (seconds) => {
