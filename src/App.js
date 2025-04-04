@@ -9,9 +9,10 @@ export default function App() {
   const [showExplanation, setShowExplanation] = useState(false);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [incorrectAnswers, setIncorrectAnswers] = useState(0);
+  const [missedQuestions, setMissedQuestions] = useState([]);
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
-  const [timer, setTimer] = useState(60 * 20); // 20 minutes
+  const [timer, setTimer] = useState(60 * 30); // 30 minutes
 
   useEffect(() => {
     let interval;
@@ -33,10 +34,19 @@ export default function App() {
   const handleAnswer = (index) => {
     setSelectedOption(index);
     setShowExplanation(true);
-    if (index === questions[currentQuestion].correct) {
+    const correctIndex = questions[currentQuestion].correct;
+
+    if (index === correctIndex) {
       setCorrectAnswers((prev) => prev + 1);
     } else {
       setIncorrectAnswers((prev) => prev + 1);
+      setMissedQuestions((prev) => [
+        ...prev,
+        {
+          ...questions[currentQuestion],
+          selected: index,
+        },
+      ]);
     }
   };
 
@@ -56,6 +66,7 @@ export default function App() {
     setShowExplanation(false);
     setCorrectAnswers(0);
     setIncorrectAnswers(0);
+    setMissedQuestions([]);
     setQuizCompleted(false);
     setTimer(60 * 30);
   };
@@ -66,6 +77,9 @@ export default function App() {
     return `${m}:${s}`;
   };
 
+  const scorePercent = Math.round((correctAnswers / questions.length) * 100);
+  const passed = scorePercent >= 85;
+
   if (mode === "landing") {
     return (
       <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ textAlign: "center", padding: 40 }}>
@@ -73,7 +87,7 @@ export default function App() {
         <p>Designed by <strong>John Clohessy</strong> • Not affiliated with Scrum.org</p>
         <p>This free quiz is designed to help you prepare for the PSM I certification and reinforce key Scrum concepts.</p>
         <p style={{ fontSize: "0.9rem", color: "gray" }}>
-          It is an independent study tool created by an experienced Scrum Master and Agile Coach. It is not affiliated with Scrum.org or any certification body.
+          It is an independent study tool created by an experienced Scrum Master and Agile Coach.
         </p>
         <div style={{ marginTop: 30 }}>
           <button onClick={() => setMode("practice")} className="primary-btn">Start Quiz</button>
@@ -101,17 +115,20 @@ export default function App() {
         </div>
       )}
 
-      <div style={{ marginBottom: 10 }}>Question {currentQuestion + 1} of {questions.length}</div>
-
-      <div style={{ backgroundColor: "#eee", height: 6, marginBottom: 20 }}>
-        <div style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%`, height: "100%", backgroundColor: "dodgerblue" }}></div>
-      </div>
-
       {!quizCompleted ? (
-        <div>
+        <>
+          <div style={{ marginBottom: 10 }}>Question {currentQuestion + 1} of {questions.length}</div>
+          <div style={{ backgroundColor: "#eee", height: 6, marginBottom: 20 }}>
+            <div style={{
+              width: `${((currentQuestion + 1) / questions.length) * 100}%`,
+              height: "100%",
+              backgroundColor: "dodgerblue"
+            }} />
+          </div>
+
           <h3 style={{ fontSize: "1.2rem" }}><strong>{questions[currentQuestion].question}</strong></h3>
           {questions[currentQuestion].options.map((option, index) => {
-            const optionLabel = String.fromCharCode(65 + index); // A, B, C, D
+            const label = String.fromCharCode(65 + index);
             const isSelected = selectedOption === index;
             const isCorrect = index === questions[currentQuestion].correct;
             let bg = "";
@@ -134,37 +151,56 @@ export default function App() {
                 }}
                 disabled={showExplanation}
               >
-                <strong>{optionLabel}.</strong> {option}
+                <strong>{label}.</strong> {option}
               </button>
             );
           })}
 
           {showExplanation && (
-            <div style={{ backgroundColor: "#f1f1f1", color: darkMode ? "#000" : undefined, padding: 20, marginTop: 20 }}>
+            <div style={{
+              backgroundColor: darkMode ? "#333" : "#f1f1f1",
+              color: darkMode ? "#fff" : "#000",
+              padding: 20,
+              marginTop: 20
+            }}>
               <p>
                 <strong>{selectedOption === questions[currentQuestion].correct ? "✅ Correct!" : "❌ Incorrect!"}</strong> {questions[currentQuestion].explanation}
               </p>
               <button onClick={nextQuestion}>Next</button>
             </div>
           )}
-        </div>
+        </>
       ) : (
         <div style={{ textAlign: "center" }}>
           <h2>Quiz Completed!</h2>
           <p>✅ Correct Answers: {correctAnswers}</p>
           <p>❌ Incorrect Answers: {incorrectAnswers}</p>
-          <h3 style={{ marginTop: "1rem", color: correctAnswers >= Math.ceil(questions.length * 0.85) ? "green" : "crimson" }}>
-            {correctAnswers >= Math.ceil(questions.length * 0.85)
-              ? "🎉 Congratulations! You passed the quiz."
-              : "⚠️ You did not reach the passing score of 85%."}
-          </h3>
-          <p style={{ fontSize: "0.9rem", color: "gray" }}>
-            Your Score: {Math.round((correctAnswers / questions.length) * 100)}%
+          <p style={{ fontSize: "1.2rem" }}>
+            {passed ? (
+              <span style={{ color: "green" }}>🎉 You passed! Great job.</span>
+            ) : (
+              <span style={{ color: "crimson" }}>⚠️ You did not reach the passing score of 85%.</span>
+            )}
           </p>
-          <button onClick={resetQuiz}>Restart Quiz</button>
+          <p>Your Score: {scorePercent}%</p>
+
+          {missedQuestions.length > 0 && (
+            <div style={{ textAlign: "left", marginTop: 30 }}>
+              <h3>Missed Questions:</h3>
+              {missedQuestions.map((q, i) => (
+                <div key={i} style={{ marginBottom: 20, padding: 10, borderBottom: "1px solid #ccc" }}>
+                  <strong>Q: {q.question}</strong>
+                  <p><strong>Your Answer:</strong> {q.options[q.selected]}</p>
+                  <p><strong>Correct Answer:</strong> {q.options[q.correct]}</p>
+                  <p><strong>Explanation:</strong> {q.explanation}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <button onClick={resetQuiz} style={{ marginTop: 20 }}>Restart Quiz</button>
         </div>
       )}
     </div>
   );
 }
-
