@@ -44,3 +44,16 @@ input, select, textarea {
   border: 1px solid #ccc;
   border-radius: 4px;
 }
+/* Explanation box styles for light and dark mode */
+.explanation-box {
+  background-color: #f1f1f1;
+  padding: 20px;
+  margin-top: 20px;
+  border-radius: 6px;
+  color: #000;
+}
+
+.app-container.dark .explanation-box {
+  background-color: #1e1e1e;
+  color: #f9f9f9;
+}
