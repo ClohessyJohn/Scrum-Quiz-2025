@@ -438,5 +438,71 @@ export const questions = [
     ],
     correct: 1,
     explanation: "Transparency allows the team and stakeholders to make decisions based on what is actually happening, not assumptions."
-  }
+  },
+  {
+  question: "Who facilitates the Sprint Planning event?",
+  options: ["Product Owner", "Scrum Master", "Developers", "All members of the Scrum Team"],
+  correct: 3,
+  explanation: "Sprint Planning is a collaborative event facilitated by the Scrum Master, but all members of the Scrum Team participate."
+},
+{
+  question: "True or False: The Product Owner can delegate backlog item prioritization to stakeholders.",
+  options: ["True", "False"],
+  correct: 1,
+  type: "boolean",
+  explanation: "While input from stakeholders is valuable, the Product Owner is solely accountable for ordering the Product Backlog."
+},
+{
+  question: "What best describes a cross-functional team?",
+  options: ["A team that works across multiple products", "A team with developers from different countries", "A team with all the skills needed to deliver a usable increment", "A team with a rotating Scrum Master"],
+  correct: 2,
+  explanation: "Cross-functional teams possess all the competencies required to deliver value without depending on others."
+},
+{
+  question: "Select all valid responsibilities of the Scrum Master:",
+  options: ["Coaching the team on Scrum", "Removing impediments", "Prioritizing backlog items", "Ensuring Scrum is understood and enacted"],
+  correct: [0, 1, 3],
+  type: "multi",
+  explanation: "The Scrum Master coaches the team, removes impediments, and supports Scrum adoption but does not manage the backlog."
+},
+{
+  question: "True or False: Only Developers attend the Daily Scrum.",
+  options: ["True", "False"],
+  correct: 0,
+  type: "boolean",
+  explanation: "Daily Scrum is for the Developers. Others may attend but only observe, unless invited to participate."
+},
+{
+  question: "Which of the following are Scrum Artifacts?",
+  options: ["Product Backlog", "Sprint Backlog", "Release Plan", "Increment"],
+  correct: [0, 1, 3],
+  type: "multi",
+  explanation: "The three Scrum artifacts are: Product Backlog, Sprint Backlog, and Increment."
+},
+{
+  question: "What is the main purpose of the Product Backlog refinement?",
+  options: ["To assign tasks to developers", "To review completed backlog items", "To ensure backlog items are understood and ready for Sprint Planning", "To remove old backlog items"],
+  correct: 2,
+  explanation: "Refinement improves clarity and detail of backlog items so they are ready for selection in Sprint Planning."
+},
+{
+  question: "True or False: The Definition of Done can vary across teams in the same organization.",
+  options: ["True", "False"],
+  correct: 0,
+  type: "boolean",
+  explanation: "Each Scrum Team can define its own Definition of Done, though organizations may encourage shared standards."
+},
+{
+  question: "When is it acceptable to cancel a Sprint?",
+  options: ["When the Product Owner decides the Sprint Goal is obsolete", "When the Scrum Master identifies too many blockers", "When most tasks are completed early", "When Developers feel the work is not interesting"],
+  correct: 0,
+  explanation: "Only the Product Owner may cancel a Sprint, and only when the Sprint Goal becomes obsolete."
+},
+{
+  question: "Select the events that are time-boxed in Scrum:",
+  options: ["Sprint", "Daily Scrum", "Sprint Review", "Backlog Refinement"],
+  correct: [0, 1, 2],
+  type: "multi",
+  explanation: "All core Scrum events except Backlog Refinement are time-boxed."
+}
 ];
