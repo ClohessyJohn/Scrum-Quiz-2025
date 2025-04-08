@@ -6,13 +6,13 @@ export default function App() {
   const [mode, setMode] = useState("landing");
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedOption, setSelectedOption] = useState(null);
+  const [selectedOption, setSelectedOption] = useState([]);
   const [showExplanation, setShowExplanation] = useState(false);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [incorrectAnswers, setIncorrectAnswers] = useState(0);
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
-  const [timer, setTimer] = useState(60 * 30); // 30 minutes
+  const [timer, setTimer] = useState(60 * 30);
   const [answers, setAnswers] = useState([]);
 
   const tips = [
@@ -48,31 +48,64 @@ export default function App() {
     return () => clearInterval(interval);
   }, [mode, quizCompleted]);
 
+  const isMultiCorrect = (q) => Array.isArray(q.correct);
+
   const handleAnswer = (index) => {
-    setSelectedOption(index);
-    setShowExplanation(true);
-    const isCorrect = index === questions[currentQuestion].correct;
-    if (isCorrect) setCorrectAnswers((prev) => prev + 1);
-    else setIncorrectAnswers((prev) => prev + 1);
+    const q = questions[currentQuestion];
+    const isMulti = isMultiCorrect(q);
+
+    if (isMulti) {
+      const alreadySelected = selectedOption.includes(index);
+      const updated = alreadySelected
+        ? selectedOption.filter((i) => i !== index)
+        : [...selectedOption, index];
+      setSelectedOption(updated);
+    } else {
+      setSelectedOption([index]);
+      setShowExplanation(true);
+      const isCorrect = index === q.correct;
+      isCorrect ? setCorrectAnswers((c) => c + 1) : setIncorrectAnswers((c) => c + 1);
+      setAnswers((prev) => [
+        ...prev,
+        {
+          question: q.question,
+          selected: [index],
+          correct: q.correct,
+          explanation: q.explanation,
+          options: q.options,
+        },
+      ]);
+
+      const nextTip = tips[Math.floor(Math.random() * tips.length)];
+      setRandomTip(nextTip);
+    }
+  };
+
+  const submitMultiAnswer = () => {
+    const q = questions[currentQuestion];
+    const isCorrect =
+      selectedOption.length === q.correct.length &&
+      selectedOption.every((val) => q.correct.includes(val));
+    isCorrect ? setCorrectAnswers((c) => c + 1) : setIncorrectAnswers((c) => c + 1);
 
     setAnswers((prev) => [
       ...prev,
       {
-        question: questions[currentQuestion].question,
-        selected: index,
-        correct: questions[currentQuestion].correct,
-        explanation: questions[currentQuestion].explanation,
-        options: questions[currentQuestion].options
-      }
+        question: q.question,
+        selected: selectedOption,
+        correct: q.correct,
+        explanation: q.explanation,
+        options: q.options,
+      },
     ]);
-
+    setShowExplanation(true);
     const nextTip = tips[Math.floor(Math.random() * tips.length)];
     setRandomTip(nextTip);
   };
 
   const nextQuestion = () => {
     if (currentQuestion < questions.length - 1) {
-      setSelectedOption(null);
+      setSelectedOption([]);
       setShowExplanation(false);
       setCurrentQuestion((prev) => prev + 1);
     } else {
@@ -82,7 +115,7 @@ export default function App() {
 
   const resetQuiz = () => {
     setCurrentQuestion(0);
-    setSelectedOption(null);
+    setSelectedOption([]);
     setShowExplanation(false);
     setCorrectAnswers(0);
     setIncorrectAnswers(0);
@@ -105,9 +138,6 @@ export default function App() {
         <h1>Scrum Master Practice Quiz 2025</h1>
         <p>Designed by <strong>John Clohessy</strong> • Not affiliated with Scrum.org</p>
         <p>This free quiz is designed to help you prepare for the PSM I certification and reinforce key Scrum concepts.</p>
-        <p style={{ fontSize: "0.9rem", color: "gray" }}>
-          It is an independent study tool created by an experienced Scrum Master and Agile Coach. It is not affiliated with Scrum.org or any certification body.
-        </p>
         <div style={{ marginTop: 30 }}>
           <button onClick={() => setMode("practice")} className="primary-btn">Start Quiz</button>
         </div>
@@ -115,46 +145,37 @@ export default function App() {
     );
   }
 
-  if (mode !== "landing" && questions.length === 0) {
-    return (
-      <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ padding: 40 }}>
-        <h2>Loading questions...</h2>
-      </div>
-    );
-  }
+  const currentQ = questions[currentQuestion];
+  const isMulti = isMultiCorrect(currentQ);
 
   return (
     <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ maxWidth: 800, margin: "auto", padding: 20 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
         <h2>Scrum Master Practice Quiz 2025</h2>
         <div>
           <button onClick={() => setMode("practice")} style={{ marginRight: 10 }}>Practice Mode</button>
           <button onClick={() => { resetQuiz(); setMode("test"); }}>Test Mode</button>
-          <button onClick={() => setDarkMode(!darkMode)} style={{ marginLeft: 10 }}>
-            {darkMode ? "☀ Light Mode" : "🌙 Dark Mode"}
-          </button>
+          <button onClick={() => setDarkMode(!darkMode)}>{darkMode ? "☀ Light" : "🌙 Dark"}</button>
         </div>
       </div>
 
       {mode === "test" && !quizCompleted && (
-        <div style={{ textAlign: "right", fontSize: "1.1rem", marginBottom: 10 }}>
-          Timer: <strong>{formatTime(timer)}</strong>
-        </div>
+        <div style={{ textAlign: "right" }}>Timer: <strong>{formatTime(timer)}</strong></div>
       )}
 
       <div style={{ marginBottom: 10 }}>Question {currentQuestion + 1} of {questions.length}</div>
-
       <div style={{ backgroundColor: "#eee", height: 6, marginBottom: 20 }}>
         <div style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%`, height: "100%", backgroundColor: "dodgerblue" }}></div>
       </div>
 
-      {!quizCompleted && questions.length > 0 ? (
+      {!quizCompleted ? (
         <div>
-          <h3 style={{ fontSize: "1.2rem" }}><strong>{questions[currentQuestion].question}</strong></h3>
-          {questions[currentQuestion].options.map((option, index) => {
-            const optionLabel = String.fromCharCode(65 + index);
-            const isSelected = selectedOption === index;
-            const isCorrect = index === questions[currentQuestion].correct;
+          <h3>{currentQ.question}</h3>
+          {currentQ.options.map((option, index) => {
+            const isSelected = selectedOption.includes(index);
+            const isCorrect = isMulti
+              ? currentQ.correct.includes(index)
+              : index === currentQ.correct;
             let bg = "";
             if (showExplanation && isSelected) {
               bg = isCorrect ? "lightgreen" : "salmon";
@@ -166,27 +187,37 @@ export default function App() {
                 style={{
                   display: "block",
                   margin: "10px 0",
-                  padding: "10px 15px",
-                  width: "100%",
-                  textAlign: "left",
                   backgroundColor: bg,
+                  padding: 10,
                   border: "1px solid #ccc",
-                  fontSize: "1rem"
+                  fontSize: "1rem",
+                  textAlign: "left",
                 }}
-                disabled={showExplanation}
+                disabled={showExplanation && !isMulti}
               >
-                <strong>{optionLabel}.</strong> {option}
+                <strong>{String.fromCharCode(65 + index)}.</strong> {option}
               </button>
             );
           })}
 
+          {isMulti && !showExplanation && (
+            <button onClick={submitMultiAnswer} className="primary-btn" style={{ marginTop: 10 }}>Submit Answer</button>
+          )}
+
           {showExplanation && (
             <div className="explanation-box">
               <p>
-                <strong>{selectedOption === questions[currentQuestion].correct ? "✅ Correct!" : "❌ Incorrect!"}</strong> {questions[currentQuestion].explanation}
+                <strong>
+                  {isMulti
+                    ? selectedOption.every((i) => currentQ.correct.includes(i)) && selectedOption.length === currentQ.correct.length
+                      ? "✅ Correct!"
+                      : "❌ Incorrect!"
+                    : selectedOption[0] === currentQ.correct
+                      ? "✅ Correct!"
+                      : "❌ Incorrect!"}
+                </strong> {currentQ.explanation}
               </p>
-              <hr />
-              <p><span role="img" aria-label="tip">💡</span> <strong>Tip:</strong> ✅ <em>{randomTip}</em></p>
+              <p><strong>Tip:</strong> 💡 {randomTip}</p>
               <button onClick={nextQuestion}>Next</button>
             </div>
           )}
@@ -197,20 +228,16 @@ export default function App() {
           <p>✅ Correct Answers: {correctAnswers}</p>
           <p>❌ Incorrect Answers: {incorrectAnswers}</p>
           <p><strong>Your Score: {percentage}%</strong></p>
-          {percentage >= 85 ? (
-            <p style={{ color: "green" }}>⭐ You passed the quiz!</p>
-          ) : (
-            <p style={{ color: "crimson" }}>❗ Keep practicing to reach 85%.</p>
-          )}
+          {percentage >= 85 ? <p style={{ color: "green" }}>⭐ You passed the quiz!</p> : <p style={{ color: "crimson" }}>❗ Keep practicing to reach 85%.</p>}
 
           <h3 style={{ textAlign: "left", marginTop: 40 }}>🔹 Review Answers</h3>
           {answers.map((ans, idx) => (
             <div key={idx} style={{ textAlign: "left", marginBottom: 20 }}>
               <p><strong>Q{idx + 1}:</strong> {ans.question}</p>
-              <p>Your answer: <strong>{String.fromCharCode(65 + ans.selected)}. {ans.options[ans.selected]}</strong></p>
-              <p>Correct answer: <strong>{String.fromCharCode(65 + ans.correct)}. {ans.options[ans.correct]}</strong></p>
-              <p style={{ color: ans.selected === ans.correct ? "green" : "crimson" }}>
-                {ans.selected === ans.correct ? "✅ Correct" : "❌ Incorrect"}
+              <p>Your answer: <strong>{ans.selected.map(i => `${String.fromCharCode(65 + i)}. ${ans.options[i]}`).join(", ")}</strong></p>
+              <p>Correct answer: <strong>{(Array.isArray(ans.correct) ? ans.correct : [ans.correct]).map(i => `${String.fromCharCode(65 + i)}. ${ans.options[i]}`).join(", ")}</strong></p>
+              <p style={{ color: JSON.stringify(ans.selected.sort()) === JSON.stringify((Array.isArray(ans.correct) ? ans.correct : [ans.correct]).sort()) ? "green" : "crimson" }}>
+                {JSON.stringify(ans.selected.sort()) === JSON.stringify((Array.isArray(ans.correct) ? ans.correct : [ans.correct]).sort()) ? "✅ Correct" : "❌ Incorrect"}
               </p>
               <p><em>{ans.explanation}</em></p>
               <hr />
@@ -222,5 +249,6 @@ export default function App() {
     </div>
   );
 }
+
 
 
