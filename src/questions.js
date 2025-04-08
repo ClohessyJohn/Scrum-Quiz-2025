@@ -504,5 +504,86 @@ export const questions = [
   correct: [0, 1, 2],
   type: "multi",
   explanation: "All core Scrum events except Backlog Refinement are time-boxed."
-}
+},
+{
+  question: "Which Scrum event is most focused on inspecting and adapting the product?",
+  options: ["Daily Scrum", "Sprint Retrospective", "Sprint Review", "Backlog Refinement"],
+  correct: 2,
+  explanation: "The Sprint Review inspects the increment and adapts the Product Backlog based on stakeholder feedback."
+},
+{
+  question: "True or False: The Sprint Backlog is owned by the Product Owner.",
+  options: ["True", "False"],
+  correct: 1,
+  type: "boolean",
+  explanation: "The Sprint Backlog is owned by the Developers, not the Product Owner."
+},
+{
+  question: "What actions are expected during the Sprint Retrospective?",
+  options: ["Planning the next Sprint", "Identifying improvements", "Celebrating success", "Adjusting the Definition of Done if needed"],
+  correct: [1, 2, 3],
+  type: "multi",
+  explanation: "Retrospectives focus on continuous improvement, including changes to processes, relationships, or the Definition of Done."
+},
+{
+  question: "Who is accountable for the value delivered by the Scrum Team?",
+  options: ["Scrum Master", "Developers", "Product Owner", "Stakeholders"],
+  correct: 2,
+  explanation: "The Product Owner is accountable for maximizing the value of the product resulting from the work of the Scrum Team."
+},
+{
+  question: "True or False: A Sprint must always be 2 weeks long.",
+  options: ["True", "False"],
+  correct: 1,
+  type: "boolean",
+  explanation: "Sprint lengths are flexible but must be one month or less. Most teams use 1–4 week Sprints."
+},
+{
+  question: "Which of the following are part of the Scrum framework?",
+  options: ["User Stories", "Timeboxing", "Roles", "Artifacts"],
+  correct: [1, 2, 3],
+  type: "multi",
+  explanation: "Scrum defines roles, events, and artifacts. Timeboxing is a key principle, but User Stories are optional."
+},
+{
+  question: "What is the purpose of the Increment?",
+  options: [
+    "To demonstrate stakeholder progress reports",
+    "To provide a releasable product slice",
+    "To archive sprint results",
+    "To generate velocity metrics"
+  ],
+  correct: 1,
+  explanation: "Each Increment is a step toward a usable product and must meet the Definition of Done."
+},
+{
+  question: "True or False: The Scrum Master can remove items from the Product Backlog.",
+  options: ["True", "False"],
+  correct: 1,
+  type: "boolean",
+  explanation: "Only the Product Owner manages the Product Backlog."
+},
+{
+  question: "Which of the following are true about Scrum Teams?",
+  options: [
+    "They are self-managing",
+    "They rely on a project manager for decisions",
+    "They are cross-functional",
+    "They deliver value every Sprint"
+  ],
+  correct: [0, 2, 3],
+  type: "multi",
+  explanation: "Scrum Teams are self-managing, cross-functional, and deliver usable increments each Sprint."
+},
+{
+  question: "What does the term 'velocity' refer to in Agile?",
+  options: [
+    "The number of bugs found per sprint",
+    "The rate at which a team completes work",
+    "The time it takes to deploy code",
+    "The frequency of releases"
+  ],
+  correct: 1,
+  explanation: "Velocity is a measure of the amount of work a team completes in a Sprint, often used for forecasting."
+}  
 ];
