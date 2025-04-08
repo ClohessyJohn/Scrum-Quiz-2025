@@ -675,6 +675,100 @@ export const questions = [
   correct: 1,
   type: "boolean",
   explanation: "While the Scrum Master often facilitates, anyone can do it as long as it serves the purpose."
+},
+{
+  question: "True or False: The Product Owner must attend the Daily Scrum.",
+  options: ["True", "False"],
+  correct: 1,
+  type: "boolean",
+  explanation: "The Daily Scrum is for Developers. The Product Owner may attend but is not required to."
+},
+{
+  question: "Which of the following are responsibilities of the Scrum Master? (Select all that apply)",
+  options: [
+    "Removing impediments",
+    "Assigning tasks to Developers",
+    "Facilitating Scrum events",
+    "Coaching the team on Agile practices"
+  ],
+  correct: [0, 2, 3],
+  type: "multi",
+  explanation: "The Scrum Master facilitates, coaches, and removes blockers, but does not assign tasks."
+},
+{
+  question: "True or False: Scrum encourages changing team members frequently to improve learning.",
+  options: ["True", "False"],
+  correct: 1,
+  type: "boolean",
+  explanation: "Scrum encourages stable teams to foster collaboration and high performance."
+},
+{
+  question: "What are the key responsibilities of Developers in Scrum? (Select all that apply)",
+  options: [
+    "Creating the Sprint Goal",
+    "Managing the Sprint Backlog",
+    "Ensuring high-quality work",
+    "Reviewing Product Backlog prioritization"
+  ],
+  correct: [0, 1, 2],
+  type: "multi",
+  explanation: "Developers manage the Sprint Backlog, commit to the Sprint Goal, and ensure quality. Prioritization is the Product Owner's responsibility."
+},
+{
+  question: "True or False: A Sprint can be cancelled if the Sprint Goal becomes obsolete.",
+  options: ["True", "False"],
+  correct: 0,
+  type: "boolean",
+  explanation: "Only the Product Owner can cancel a Sprint if the goal is no longer valid."
+},
+{
+  question: "Which artifacts are defined by Scrum? (Select all that apply)",
+  options: [
+    "Product Backlog",
+    "Sprint Backlog",
+    "Release Plan",
+    "Increment"
+  ],
+  correct: [0, 1, 3],
+  type: "multi",
+  explanation: "Scrum defines three artifacts: Product Backlog, Sprint Backlog, and the Increment. Release Plans are not a Scrum artifact."
+},
+{
+  question: "True or False: The Sprint Review replaces the need for regular stakeholder communication.",
+  options: ["True", "False"],
+  correct: 1,
+  type: "boolean",
+  explanation: "While Sprint Reviews engage stakeholders, ongoing communication is still important."
+},
+{
+  question: "Which elements are inspected during a Sprint Review? (Select all that apply)",
+  options: [
+    "The Increment",
+    "Product Backlog progress",
+    "Team velocity",
+    "Stakeholder feedback"
+  ],
+  correct: [0, 1, 3],
+  type: "multi",
+  explanation: "Sprint Reviews cover the Increment, progress toward goals, and feedback. Velocity may be discussed but isn't the focus."
+},
+{
+  question: "True or False: A Scrum Master can also be a Developer on the same team.",
+  options: ["True", "False"],
+  correct: 0,
+  type: "boolean",
+  explanation: "Scrum does not prevent a person from taking on multiple roles, as long as responsibilities are fulfilled."
+},
+{
+  question: "Which of the following contribute to Sprint Goal creation? (Select all that apply)",
+  options: [
+    "Product Owner",
+    "Developers",
+    "Scrum Master",
+    "Stakeholders"
+  ],
+  correct: [0, 1],
+  type: "multi",
+  explanation: "The Product Owner and Developers collaborate during Sprint Planning to define the Sprint Goal."
 }
-
 ];
