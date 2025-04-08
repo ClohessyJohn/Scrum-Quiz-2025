@@ -585,5 +585,96 @@ export const questions = [
   ],
   correct: 1,
   explanation: "Velocity is a measure of the amount of work a team completes in a Sprint, often used for forecasting."
-}  
+},
+{
+  question: "True or False: Developers can modify the Definition of Done without the Product Owner’s input.",
+  options: ["True", "False"],
+  correct: 0,
+  type: "boolean",
+  explanation: "Developers define the Definition of Done, but it must be transparent to the whole team and organization."
+},
+{
+  question: "Select all elements of Scrum Artifacts:",
+  options: [
+    "Product Backlog",
+    "Sprint Backlog",
+    "Increment",
+    "Burndown Chart"
+  ],
+  correct: [0, 1, 2],
+  type: "multi",
+  explanation: "Scrum Artifacts are Product Backlog, Sprint Backlog, and Increment. Burndown Charts are tools, not artifacts."
+},
+{
+  question: "True or False: The Sprint Goal can evolve during the Sprint.",
+  options: ["True", "False"],
+  correct: 1,
+  type: "boolean",
+  explanation: "The Sprint Goal remains unchanged during the Sprint. It helps provide focus and purpose."
+},
+{
+  question: "Select the key responsibilities of the Scrum Master:",
+  options: [
+    "Facilitating Scrum events",
+    "Ensuring team productivity metrics are reported",
+    "Coaching the organization in Scrum",
+    "Managing the Product Backlog"
+  ],
+  correct: [0, 2],
+  type: "multi",
+  explanation: "Scrum Masters facilitate Scrum and coach the organization. They do not manage backlogs or track metrics."
+},
+{
+  question: "True or False: During the Sprint Review, the Product Owner can cancel the Sprint.",
+  options: ["True", "False"],
+  correct: 1,
+  type: "boolean",
+  explanation: "A Sprint can only be cancelled before it ends, not during the Sprint Review."
+},
+{
+  question: "Select valid uses of the Daily Scrum:",
+  options: [
+    "Plan the next 24 hours",
+    "Assign tasks to each other",
+    "Identify impediments",
+    "Replan Sprint Backlog"
+  ],
+  correct: [0, 2, 3],
+  type: "multi",
+  explanation: "Daily Scrum is a planning event, used to inspect and adapt the Sprint Backlog. It’s not for task assignment."
+},
+{
+  question: "True or False: The Scrum Master is responsible for team delivery.",
+  options: ["True", "False"],
+  correct: 1,
+  type: "boolean",
+  explanation: "The team is responsible for delivery. The Scrum Master enables success but doesn’t own delivery."
+},
+{
+  question: "True or False: The Product Backlog must be fully detailed before the first Sprint.",
+  options: ["True", "False"],
+  correct: 1,
+  type: "boolean",
+  explanation: "Scrum supports emergent design. The Product Backlog is dynamic and evolves."
+},
+{
+  question: "Select all that reflect Scrum’s empirical nature:",
+  options: [
+    "Transparency",
+    "Accountability",
+    "Inspection",
+    "Adaptation"
+  ],
+  correct: [0, 2, 3],
+  type: "multi",
+  explanation: "The pillars of empiricism are Transparency, Inspection, and Adaptation."
+},
+{
+  question: "True or False: Only the Scrum Master can facilitate the Sprint Retrospective.",
+  options: ["True", "False"],
+  correct: 1,
+  type: "boolean",
+  explanation: "While the Scrum Master often facilitates, anyone can do it as long as it serves the purpose."
+}
+
 ];
