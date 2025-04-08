@@ -53,7 +53,7 @@ export const questions = [
     ],
     correct: 0,
     explanation: "The Sprint Review is an opportunity for the Scrum Team and stakeholders to inspect the work done and adapt the Product Backlog if needed."
-  }
+  },
 {
     question: "How long is a typical Daily Scrum?",
     options: [
