@@ -526,4 +526,4 @@ export const questions = [
   correct: 1,
   type: "boolean",
   explanation: "Scrum doesn’t mandate any tool like Kanban boards, although visualizing work is encouraged."
-},
+}
