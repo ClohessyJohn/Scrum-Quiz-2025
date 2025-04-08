@@ -440,3 +440,90 @@ export const questions = [
     explanation: "Transparency allows the team and stakeholders to make decisions based on what is actually happening, not assumptions."
   }
 ];
+{
+  question: "True or False: Scrum requires the use of User Stories to describe Product Backlog items.",
+  options: ["True", "False"],
+  correct: 1,
+  type: "boolean",
+  explanation: "Scrum does not prescribe any specific format like User Stories. It focuses on value and clarity, but the format is flexible."
+},
+{
+  question: "Select the roles defined in Scrum:",
+  options: ["Product Owner", "Project Manager", "Scrum Master", "Developers"],
+  correct: [0, 2, 3],
+  type: "multi",
+  explanation: "Scrum defines three roles: Product Owner, Scrum Master, and Developers. Project Manager is not a Scrum role."
+},
+{
+  question: "Who is responsible for creating the Definition of Done?",
+  options: ["Product Owner", "Scrum Master", "Developers", "Stakeholders"],
+  correct: 2,
+  explanation: "The Developers define the Definition of Done to ensure shared understanding and quality."
+},
+{
+  question: "True or False: The Sprint Backlog can change during a Sprint.",
+  options: ["True", "False"],
+  correct: 0,
+  type: "boolean",
+  explanation: "Yes, the Sprint Backlog is owned by Developers and can evolve as they learn more about the work."
+},
+{
+  question: "What are valid outcomes of a Sprint Review? (Select all that apply)",
+  options: [
+    "Adjustments to the Product Backlog",
+    "Approval of team bonuses",
+    "Feedback from stakeholders",
+    "Decision to cancel future Sprints"
+  ],
+  correct: [0, 2],
+  type: "multi",
+  explanation: "Sprint Reviews are about inspection and adaptation, not performance reviews or cancellations."
+},
+{
+  question: "What is the purpose of the Daily Scrum?",
+  options: [
+    "Report to the Scrum Master",
+    "Plan the work for the next 24 hours",
+    "Update the Product Owner",
+    "Assign tasks to team members"
+  ],
+  correct: 1,
+  explanation: "The Developers use the Daily Scrum to inspect progress and adapt their plan for the day."
+},
+{
+  question: "True or False: Stakeholders must attend the Sprint Retrospective.",
+  options: ["True", "False"],
+  correct: 1,
+  type: "boolean",
+  explanation: "The Sprint Retrospective is strictly for the Scrum Team. Stakeholders do not attend."
+},
+{
+  question: "What happens if the Product Owner is unavailable during a Sprint?",
+  options: [
+    "The Scrum Master takes over their responsibilities",
+    "Developers continue and seek clarification later",
+    "The Sprint is paused",
+    "The stakeholders make decisions"
+  ],
+  correct: 1,
+  explanation: "The team continues working with the best available info. The Sprint is never paused."
+},
+{
+  question: "Select the key responsibilities of the Product Owner:",
+  options: [
+    "Managing the Product Backlog",
+    "Facilitating the Daily Scrum",
+    "Ensuring the team meets deadlines",
+    "Maximizing value delivered by the product"
+  ],
+  correct: [0, 3],
+  type: "multi",
+  explanation: "The Product Owner manages the backlog and ensures value delivery. They don’t facilitate Scrum events or enforce deadlines."
+},
+{
+  question: "True or False: Scrum Teams must use Kanban boards.",
+  options: ["True", "False"],
+  correct: 1,
+  type: "boolean",
+  explanation: "Scrum doesn’t mandate any tool like Kanban boards, although visualizing work is encouraged."
+}
