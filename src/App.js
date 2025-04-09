@@ -48,11 +48,13 @@ export default function App() {
     return () => clearInterval(interval);
   }, [mode, quizCompleted]);
 
-  const isMultiCorrect = (q) => Array.isArray(q.correct);
-  const isBoolean = (q) => q.type === "boolean";
+  const isMultiCorrect = (q) => Array.isArray(q?.correct);
+  const isBoolean = (q) => q?.type === "boolean";
 
   const handleAnswer = (index) => {
     const q = questions[currentQuestion];
+    if (!q) return;
+
     const isMulti = isMultiCorrect(q);
     if (isMulti) {
       const alreadySelected = selectedOption.includes(index);
@@ -81,6 +83,7 @@ export default function App() {
 
   const submitMultiAnswer = () => {
     const q = questions[currentQuestion];
+    if (!q) return;
     const isCorrect =
       selectedOption.length === q.correct.length &&
       selectedOption.every((val) => q.correct.includes(val));
@@ -127,8 +130,8 @@ export default function App() {
   };
 
   const percentage = Math.round((correctAnswers / questions.length) * 100);
-  const currentQ = questions[currentQuestion];
-  const isMulti = isMultiCorrect(currentQ);
+  const currentQ = questions[currentQuestion] || null;
+  const isMulti = currentQ ? isMultiCorrect(currentQ) : false;
 
   if (mode === "landing") {
     return (
@@ -172,7 +175,7 @@ export default function App() {
         <div style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%`, height: "100%", backgroundColor: "dodgerblue" }}></div>
       </div>
 
-      {!quizCompleted ? (
+      {!quizCompleted && currentQ ? (
         <div>
           <h3>{currentQ.question}</h3>
           {currentQ.options.map((option, index) => {
@@ -224,7 +227,7 @@ export default function App() {
             </div>
           )}
         </div>
-      ) : (
+      ) : quizCompleted ? (
         <div style={{ textAlign: "center" }}>
           <h2>✅ Quiz Completed!</h2>
           <p>✅ Correct Answers: {correctAnswers}</p>
@@ -247,7 +250,8 @@ export default function App() {
           ))}
           <button onClick={resetQuiz}>Restart Quiz</button>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
+
