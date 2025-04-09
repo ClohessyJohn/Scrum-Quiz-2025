@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { questions as originalQuestions } from "./questions";
 import "./App.css";
@@ -73,8 +72,8 @@ export default function App() {
           selected: [index],
           correct: q.correct,
           explanation: q.explanation,
-          options: q.options,
-        },
+          options: q.options
+        }
       ]);
       setRandomTip(tips[Math.floor(Math.random() * tips.length)]);
     }
@@ -93,8 +92,8 @@ export default function App() {
         selected: selectedOption,
         correct: q.correct,
         explanation: q.explanation,
-        options: q.options,
-      },
+        options: q.options
+      }
     ]);
     setShowExplanation(true);
     setRandomTip(tips[Math.floor(Math.random() * tips.length)]);
@@ -124,14 +123,16 @@ export default function App() {
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60).toString().padStart(2, "0");
     const s = (seconds % 60).toString().padStart(2, "0");
-    return \`\${m}:\${s}\`;
+    return `${m}:${s}`;
   };
 
   const percentage = Math.round((correctAnswers / questions.length) * 100);
+  const currentQ = questions[currentQuestion];
+  const isMulti = isMultiCorrect(currentQ);
 
   if (mode === "landing") {
     return (
-      <div className={\`app-container \${darkMode ? "dark" : ""}\`} style={{ textAlign: "center", padding: 40 }}>
+      <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ textAlign: "center", padding: 40 }}>
         <h1>Scrum Master Practice Quiz 2025</h1>
         <p>Designed by <strong>John Clohessy</strong> • Not affiliated with Scrum.org</p>
         <p>This quiz helps prepare for the PSM I certification by reinforcing Scrum concepts.</p>
@@ -144,18 +145,14 @@ export default function App() {
 
   if (mode !== "landing" && questions.length === 0) {
     return (
-      <div className={\`app-container \${darkMode ? "dark" : ""}\`} style={{ padding: 40 }}>
+      <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ padding: 40 }}>
         <h2>Loading questions...</h2>
       </div>
     );
   }
 
-  const currentQ = questions[currentQuestion];
-  const isMulti = isMultiCorrect(currentQ);
-  const isBool = isBoolean(currentQ);
-
   return (
-    <div className={\`app-container \${darkMode ? "dark" : ""}\`} style={{ maxWidth: 800, margin: "auto", padding: 20 }}>
+    <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ maxWidth: 800, margin: "auto", padding: 20 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h2>Scrum Master Practice Quiz 2025</h2>
         <div>
@@ -172,7 +169,7 @@ export default function App() {
       <div style={{ marginBottom: 10 }}>Question {currentQuestion + 1} of {questions.length}</div>
 
       <div style={{ backgroundColor: "#eee", height: 6, marginBottom: 20 }}>
-        <div style={{ width: \`\${((currentQuestion + 1) / questions.length) * 100}%\`, height: "100%", backgroundColor: "dodgerblue" }}></div>
+        <div style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%`, height: "100%", backgroundColor: "dodgerblue" }}></div>
       </div>
 
       {!quizCompleted ? (
@@ -196,7 +193,7 @@ export default function App() {
                   padding: 10,
                   border: "1px solid #ccc",
                   fontSize: "1rem",
-                  textAlign: "left",
+                  textAlign: "left"
                 }}
                 disabled={showExplanation && !isMulti}
               >
@@ -239,8 +236,8 @@ export default function App() {
           {answers.map((ans, idx) => (
             <div key={idx} style={{ textAlign: "left", marginBottom: 20 }}>
               <p><strong>Q{idx + 1}:</strong> {ans.question}</p>
-              <p>Your answer: <strong>{ans.selected.map(i => \`\${String.fromCharCode(65 + i)}. \${ans.options[i]}\`).join(", ")}</strong></p>
-              <p>Correct answer: <strong>{(Array.isArray(ans.correct) ? ans.correct : [ans.correct]).map(i => \`\${String.fromCharCode(65 + i)}. \${ans.options[i]}\`).join(", ")}</strong></p>
+              <p>Your answer: <strong>{ans.selected.map(i => `${String.fromCharCode(65 + i)}. ${ans.options[i]}`).join(", ")}</strong></p>
+              <p>Correct answer: <strong>{(Array.isArray(ans.correct) ? ans.correct : [ans.correct]).map(i => `${String.fromCharCode(65 + i)}. ${ans.options[i]}`).join(", ")}</strong></p>
               <p style={{ color: JSON.stringify(ans.selected.sort()) === JSON.stringify((Array.isArray(ans.correct) ? ans.correct : [ans.correct]).sort()) ? "green" : "crimson" }}>
                 {JSON.stringify(ans.selected.sort()) === JSON.stringify((Array.isArray(ans.correct) ? ans.correct : [ans.correct]).sort()) ? "✅ Correct" : "❌ Incorrect"}
               </p>
