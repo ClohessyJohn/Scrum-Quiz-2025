@@ -25,11 +25,11 @@ export default function App() {
   const [randomTip, setRandomTip] = useState(tips[0]);
 
   useEffect(() => {
-    if (mode !== "landing") {
+    if (mode !== "landing" && questions.length === 0) {
       const shuffled = [...originalQuestions].sort(() => Math.random() - 0.5);
       setQuestions(shuffled);
     }
-  }, [mode]);
+  }, [mode, questions.length]);
 
   useEffect(() => {
     let interval;
@@ -49,16 +49,13 @@ export default function App() {
   }, [mode, quizCompleted]);
 
   const isMultiCorrect = (q) => Array.isArray(q?.correct);
-  const isBoolean = (q) => q?.type === "boolean";
 
   const handleAnswer = (index) => {
     const q = questions[currentQuestion];
     if (!q) return;
-
     const isMulti = isMultiCorrect(q);
     if (isMulti) {
-      const alreadySelected = selectedOption.includes(index);
-      const updated = alreadySelected
+      const updated = selectedOption.includes(index)
         ? selectedOption.filter((i) => i !== index)
         : [...selectedOption, index];
       setSelectedOption(updated);
@@ -69,13 +66,7 @@ export default function App() {
       isCorrect ? setCorrectAnswers((c) => c + 1) : setIncorrectAnswers((c) => c + 1);
       setAnswers((prev) => [
         ...prev,
-        {
-          question: q.question,
-          selected: [index],
-          correct: q.correct,
-          explanation: q.explanation,
-          options: q.options
-        }
+        { question: q.question, selected: [index], correct: q.correct, explanation: q.explanation, options: q.options }
       ]);
       setRandomTip(tips[Math.floor(Math.random() * tips.length)]);
     }
@@ -90,13 +81,7 @@ export default function App() {
     isCorrect ? setCorrectAnswers((c) => c + 1) : setIncorrectAnswers((c) => c + 1);
     setAnswers((prev) => [
       ...prev,
-      {
-        question: q.question,
-        selected: selectedOption,
-        correct: q.correct,
-        explanation: q.explanation,
-        options: q.options
-      }
+      { question: q.question, selected: selectedOption, correct: q.correct, explanation: q.explanation, options: q.options }
     ]);
     setShowExplanation(true);
     setRandomTip(tips[Math.floor(Math.random() * tips.length)]);
@@ -123,12 +108,7 @@ export default function App() {
     setAnswers([]);
   };
 
-  const formatTime = (seconds) => {
-    const m = Math.floor(seconds / 60).toString().padStart(2, "0");
-    const s = (seconds % 60).toString().padStart(2, "0");
-    return `${m}:${s}`;
-  };
-
+  const formatTime = (seconds) => `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
   const percentage = Math.round((correctAnswers / questions.length) * 100);
   const currentQ = questions[currentQuestion] || null;
   const isMulti = currentQ ? isMultiCorrect(currentQ) : false;
@@ -147,11 +127,7 @@ export default function App() {
   }
 
   if (mode !== "landing" && questions.length === 0) {
-    return (
-      <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ padding: 40 }}>
-        <h2>Loading questions...</h2>
-      </div>
-    );
+    return <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ padding: 40 }}><h2>Loading questions...</h2></div>;
   }
 
   return (
@@ -191,16 +167,7 @@ export default function App() {
               <button
                 key={index}
                 onClick={() => handleAnswer(index)}
-                style={{
-                  display: "block",
-                  margin: "10px 0",
-                  backgroundColor: bg,
-                  padding: 10,
-                  border: "1px solid #ccc",
-                  fontSize: "1rem",
-                  textAlign: "left",
-                  fontWeight: isSelected ? "bold" : "normal"
-                }}
+                style={{ display: "block", margin: "10px 0", backgroundColor: bg, padding: 10, border: "1px solid #ccc", fontSize: "1rem", textAlign: "left" }}
                 disabled={showExplanation && !isMulti}
               >
                 <strong>{String.fromCharCode(65 + index)}.</strong> {option}
@@ -257,3 +224,4 @@ export default function App() {
     </div>
   );
 }
+
