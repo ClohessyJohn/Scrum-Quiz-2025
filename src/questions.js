@@ -303,7 +303,7 @@ export const questions = [
     correct: 1,
     type: "boolean",
     explanation: "Healthy conflict fosters innovation and problem-solving—eliminating all disagreements would be counterproductive."
-  }
+  },
   {
     question: "A Scrum Master is working with multiple teams on a shared product. What is the best way to coordinate their efforts?",
     options: [
@@ -322,7 +322,7 @@ export const questions = [
     correct: 1,
     type: "boolean",
     explanation: "While Scrum Masters help address impediments, they also empower the team to solve challenges independently."
-  }
+  },
 {
     question: "A Scrum Master notices that the team repeatedly struggles with time management during Sprints. What is the best approach?",
     options: [
@@ -341,7 +341,7 @@ export const questions = [
     correct: 1,
     type: "boolean",
     explanation: "Scrum focuses on team success rather than individual metrics—collaboration is prioritized over personal productivity tracking."
-  }
+  },
 {
     question: "A Scrum Master notices that the team repeatedly struggles with time management during Sprints. What is the best approach?",
     options: [
@@ -360,7 +360,7 @@ export const questions = [
     correct: 1,
     type: "boolean",
     explanation: "Scrum focuses on team success rather than individual metrics—collaboration is prioritized over personal productivity tracking."
-  }
+  },
 {
     question: "A Scrum Master notices that the team repeatedly struggles with time management during Sprints. What is the best approach?",
     options: [
@@ -379,7 +379,7 @@ export const questions = [
     correct: 1,
     type: "boolean",
     explanation: "Scrum focuses on team success rather than individual metrics—collaboration is prioritized over personal productivity tracking."
-  }
+  },
   {
     question: "A Scrum Master notices that some team members hesitate to speak up in Sprint Retrospectives. What should they do?",
     options: [
@@ -398,7 +398,7 @@ export const questions = [
     correct: 1,
     type: "boolean",
     explanation: "The Scrum Master facilitates healthy conflict resolution but does not directly intervene unless necessary. The team should develop self-management skills."
-  }
+  },
   {
     question: "A Scrum Master is working with an organization transitioning from Waterfall to Scrum. What is the best approach?",
     options: [
@@ -448,7 +448,7 @@ export const questions = [
     correct: [0],
     type: "multi",
     explanation: "Providing facilitation techniques like velocity tracking and estimation helps improve forecasting while keeping decisions within the team."
-  }
+  },
   {
     question: "A Scrum Master is coaching an organization that struggles with stakeholder collaboration. What is the best approach?",
     options: [
@@ -498,7 +498,7 @@ export const questions = [
     correct: [0],
     type: "multi",
     explanation: "Coaching the Product Owner helps create stability and better backlog management. Allowing constant change disrupts Sprint focus."
-  }
+  },
   {
     question: "A Scrum Team frequently struggles with Sprint Reviews because stakeholders provide conflicting feedback. What should the Scrum Master do?",
     options: [
@@ -548,7 +548,7 @@ export const questions = [
     correct: [0],
     type: "multi",
     explanation: "Relative estimation techniques help teams improve accuracy. Enforcing strict limits or ignoring estimation issues would not be helpful."
-  }
+  },
   {
     question: "A Scrum Team is struggling with integrating work across multiple teams. What should the Scrum Master do?",
     options: [
@@ -598,7 +598,7 @@ export const questions = [
     correct: [0],
     type: "multi",
     explanation: "Breaking down large backlog items improves estimation accuracy and helps with Sprint predictability."
-  }
+  },
   {
     question: "A Scrum Team is struggling with integrating work across multiple teams. What should the Scrum Master do?",
     options: [
@@ -660,7 +660,7 @@ export const questions = [
     correct: [0],
     type: "multi",
     explanation: "Backlog refinement is a collaborative effort. The Scrum Master helps ensure alignment between Developers and the Product Owner."
-  }
+  },
   {
     question: "A Scrum Team struggles with writing effective Sprint Goals. What is the best approach?",
     options: [
@@ -710,7 +710,7 @@ export const questions = [
     correct: [0],
     type: "multi",
     explanation: "Fostering continuous learning and collaborative technical practices enhances quality and innovation within the team."
-  }
+  },
   {
     question: "A Scrum Team struggles with handling technical debt. What should the Scrum Master do?",
     options: [
@@ -760,7 +760,7 @@ export const questions = [
     correct: [0],
     type: "multi",
     explanation: "Minimizing Sprint interruptions ensures focus and helps teams deliver high-quality work effectively."
-  }
+  },
 {
   "question": "Two Scrum Teams are blocked due to shared backend services. What is the Scrum Master’s first step?",
   "type": "multiple",
