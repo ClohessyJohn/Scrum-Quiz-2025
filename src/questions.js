@@ -74,7 +74,7 @@ export const questions = [
     explanation: "Improving planning and optionally pulling in more work maintains flow. Changing team size or Sprint length is not appropriate."
   },
   {
-    question: "True or False: A Scrum Master should protect the team from all outside communication during the Sprint.",
+    question: "True or False: The Scrum Master should protect the team from all outside communication during the Sprint.",
     options: ["True", "False"],
     correct: 1,
     type: "boolean",
@@ -670,5 +670,5 @@ export const questions = [
     correct: [0],
     type: "multi",
     explanation: "The Product Owner manages the Product Backlog. Coaching stakeholders to respect this role maintains clarity and focus (Scrum Guide)."
-  }
+  },
 ];
