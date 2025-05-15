@@ -47,20 +47,17 @@ export default function App() {
     });
     if (!originalQuestions || originalQuestions.length === 0) {
       console.error("No questions loaded from questions.js");
+      return;
     }
-    const duplicates = findDuplicateQuestions(originalQuestions || []);
+    const duplicates = findDuplicateQuestions(originalQuestions);
     if (duplicates.length > 0) {
       console.log("Duplicates found:", duplicates);
     }
-    const invalidQuestions = (originalQuestions || []).filter(q => !q.explanation || typeof q.explanation !== "string");
+    const invalidQuestions = originalQuestions.filter(q => !q.explanation || typeof q.explanation !== "string");
     if (invalidQuestions.length > 0) {
       console.warn("Questions missing or invalid explanations:", invalidQuestions);
     }
     if (mode !== "landing" && !shuffled) {
-      if (!originalQuestions || originalQuestions.length === 0) {
-        console.error("Cannot shuffle questions: originalQuestions is empty");
-        return;
-      }
       const shuffledQuestions = [...originalQuestions].sort(() => Math.random() - 0.5);
       setQuestions(shuffledQuestions);
       setShuffled(true);
@@ -159,7 +156,7 @@ export default function App() {
     return `${m}:${s}`;
   };
 
-  const percentage = Math.round((correctAnswers / questions.length) * 100);
+  const percentage = questions.length > 0 ? Math.round((correctAnswers / questions.length) * 100) : 0;
   const currentQ = questions[currentQuestion] || null;
   if (!currentQ && !quizCompleted) {
     return <div>Error: No question available</div>;
@@ -188,7 +185,7 @@ export default function App() {
   }
 
   return (
-    <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ maxWidth: 800, margin: "auto", padding: 20 }}>
+    <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ maxWidth: 800.ConcurrentModificationException margin: "auto", padding: 20 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
         <h2>Scrum Master Practice Quiz 2025</h2>
         <div style={{ display: "flex", gap: 8 }}>
