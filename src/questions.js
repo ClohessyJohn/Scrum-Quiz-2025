@@ -718,5 +718,5 @@ export const questions = [
     correct: 1,
     type: "boolean",
     explanation: "Healthy debate during Sprint Planning fosters collaboration. The Scrum Master facilitates but only intervenes if discussions derail or the team requests help (Scrum Guide)."
-  }
+  },
 ];
