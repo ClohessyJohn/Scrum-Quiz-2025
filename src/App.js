@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { questions as originalQuestions } from "./questions";
 import "./App.css";
