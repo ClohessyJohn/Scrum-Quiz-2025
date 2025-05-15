@@ -1,207 +1,154 @@
 export const questions = [
+  // Existing questions...
   {
-    question: "A stakeholder repeatedly interrupts Sprint Reviews with last-minute change requests. What is the Scrum Master's best response?",
+    question: "A Scrum Master notices that the team is consistently missing Sprint Goals. What should they do first?",
     options: [
-      "Allow the changes to be considered immediately",
-      "Remind stakeholders of the Sprint boundary and review purpose",
-      "Coach the Product Owner to manage stakeholder expectations",
-      "Cancel the review until the stakeholder agrees to the format"
+      "Increase the Sprint duration",
+      "Analyze the team's velocity trends",
+      "Encourage the team to commit to fewer items",
+      "Replace underperforming team members"
     ],
     correct: [1, 2],
     type: "multi",
-    explanation: "B and C demonstrate the Scrum Master’s coaching and facilitation role. A undermines the Sprint boundary, and D is too extreme."
+    explanation: "Examining velocity trends and adjusting commitments helps improve predictability. Changing Sprint duration or replacing members is not ideal."
   },
   {
-    question: "True or False: The Scrum Master is responsible for the team's delivery velocity.",
+    question: "True or False: The Scrum Master should assign tasks to Developers.",
     options: ["True", "False"],
     correct: 1,
     type: "boolean",
-    explanation: "The Scrum Master facilitates continuous improvement but does not manage velocity, which is a metric owned by the Developers."
+    explanation: "Developers self-organize and decide how to complete work. The Scrum Master facilitates but does not assign tasks."
   },
   {
-    question: "During a Retrospective, team members are reluctant to speak. What should the Scrum Master do?",
+    question: "Which of the following are valid ways to improve Sprint Planning?",
     options: [
-      "Introduce anonymous feedback tools",
-      "End the session early",
-      "Use facilitation techniques to create psychological safety",
-      "Report the team’s silence to upper management"
+      "Ensure backlog refinement is done beforehand",
+      "Limit discussions to 15 minutes",
+      "Encourage Developers to estimate collaboratively",
+      "Allow only the Product Owner to decide Sprint scope"
     ],
     correct: [0, 2],
     type: "multi",
-    explanation: "Anonymous input and improved facilitation build trust. Ending early avoids the issue, and escalating undermines team autonomy."
+    explanation: "Refinement and collaborative estimation improve planning. Rushing discussions or limiting decision-making contradict Scrum principles."
   },
   {
-    question: "A Product Owner insists on reassigning unfinished work mid-Sprint. What should the Scrum Master do?",
+    question: "A stakeholder demands daily progress reports from the Scrum Team. What should the Scrum Master do?",
     options: [
-      "Coach the PO on Sprint stability",
-      "Allow the changes if the Developers agree",
-      "Remind the team that scope is frozen during the Sprint",
-      "Escalate to senior leadership"
-    ],
-    correct: [0, 2],
-    type: "multi",
-    explanation: "Sprint scope should not change arbitrarily. Coaching and reinforcement of Scrum principles are the correct approaches."
-  },
-  {
-    question: "True or False: The Scrum Master should intervene when Developers argue about task estimates during Daily Scrum.",
-    options: ["True", "False"],
-    correct: 1,
-    type: "boolean",
-    explanation: "Daily Scrum is for Developers. The Scrum Master only intervenes if the team strays from purpose or requests help."
-  },
-  {
-    question: "Which of the following indicate a strong coaching mindset by a Scrum Master?",
-    options: [
-      "Asking powerful, open-ended questions",
-      "Setting team deadlines",
-      "Observing without dominating conversations",
-      "Providing solutions before listening"
-    ],
-    correct: [0, 2],
-    type: "multi",
-    explanation: "A coaching approach emphasizes listening and facilitation, not control or direction."
-  },
-  {
-    question: "A team consistently finishes work early and spends the rest of the Sprint idle. What’s the Scrum Master's best approach?",
-    options: [
-      "Help them improve forecasting",
-      "Encourage pulling in additional work from the Product Backlog",
-      "Extend the Sprint",
-      "Reduce the team size"
-    ],
-    correct: [0, 1],
-    type: "multi",
-    explanation: "Improving planning and optionally pulling in more work maintains flow. Changing team size or Sprint length is not appropriate."
-  },
-  {
-    question: "True or False: A Scrum Master should protect the team from all outside communication during the Sprint.",
-    options: ["True", "False"],
-    correct: 1,
-    type: "boolean",
-    explanation: "The Scrum Master protects the team from disruption, but not healthy collaboration or transparency."
-  },
-  {
-    question: "What should a Scrum Master do when multiple teams need to coordinate on a shared product?",
-    options: [
-      "Enforce a single Sprint schedule for all",
-      "Facilitate cross-team Scrum of Scrums",
-      "Help define shared Definition of Done",
-      "Assign a project manager"
+      "Provide reports as requested",
+      "Encourage stakeholders to attend Daily Scrum",
+      "Explain the purpose of Sprint Reviews",
+      "Ignore the request"
     ],
     correct: [1, 2],
     type: "multi",
-    explanation: "Coordination through shared practices and facilitation supports scaling. Assigning roles outside Scrum contradicts its principles."
+    explanation: "Stakeholders should engage through Scrum events rather than imposing reporting overhead."
   },
   {
-    question: "A team is skipping Retrospectives due to 'lack of value.' What’s the best intervention?",
+    question: "True or False: The Scrum Master should ensure the team follows Scrum exactly as described in the Scrum Guide.",
+    options: ["True", "False"],
+    correct: 1,
+    type: "boolean",
+    explanation: "Scrum is a framework, not a rigid process. Teams adapt it to their needs while maintaining core principles."
+  },
+  {
+    question: "A Scrum Team struggles with dependencies on another team. What should the Scrum Master do?",
     options: [
-      "Mandate attendance",
-      "Facilitate a different format or game",
-      "Explore blockers in a 1:1 setting",
-      "Remove Retrospectives from the schedule"
+      "Facilitate cross-team collaboration",
+      "Extend the Sprint duration",
+      "Assign a project manager to resolve dependencies",
+      "Ignore the issue"
     ],
-    correct: [1, 2],
+    correct: [0],
     type: "multi",
-    explanation: "Changing approach and engaging team privately fosters continuous improvement. Mandating or removing it undermines Scrum."
+    explanation: "Collaboration is key to resolving dependencies. Extending Sprints or assigning managers contradicts Agile principles."
   },
   {
-    question: "True or False: The Scrum Master must ensure all Scrum events happen.",
+    question: "True or False: The Scrum Master should track individual Developer performance.",
+    options: ["True", "False"],
+    correct: 1,
+    type: "boolean",
+    explanation: "Scrum focuses on team performance, not individual tracking. The Scrum Master fosters collaboration, not micromanagement."
+  },
+  {
+    question: "What should a Scrum Master do if the team is hesitant to experiment with new practices?",
+    options: [
+      "Mandate changes immediately",
+      "Encourage small, safe experiments",
+      "Ignore resistance and continue as usual",
+      "Replace hesitant team members"
+    ],
+    correct: [1],
+    type: "multi",
+    explanation: "Encouraging small experiments fosters learning. Forcing change or ignoring concerns undermines trust."
+  },
+  {
+    question: "True or False: The Scrum Master should ensure the team never fails a Sprint Goal.",
+    options: ["True", "False"],
+    correct: 1,
+    type: "boolean",
+    explanation: "Failure is part of learning. The Scrum Master helps teams improve, not avoid failure entirely."
+  },
+  {
+    question: "Which of the following are signs of a healthy Scrum Team?",
+    options: [
+      "Frequent collaboration",
+      "Avoiding difficult conversations",
+      "Regular adaptation",
+      "Strict hierarchy enforcement"
+    ],
+    correct: [0, 2],
+    type: "multi",
+    explanation: "Healthy teams collaborate and adapt. Avoiding conflict or enforcing hierarchy contradicts Agile values."
+  },
+  {
+    question: "A Scrum Team is struggling with excessive work-in-progress. What should the Scrum Master do?",
+    options: [
+      "Encourage limiting WIP",
+      "Increase Sprint duration",
+      "Assign more Developers",
+      "Ignore the issue"
+    ],
+    correct: [0],
+    type: "multi",
+    explanation: "Limiting WIP improves focus and flow. Extending Sprints or adding members does not address the root cause."
+  },
+  {
+    question: "True or False: The Scrum Master should ensure the team works overtime to meet Sprint Goals.",
+    options: ["True", "False"],
+    correct: 1,
+    type: "boolean",
+    explanation: "Sustainable pace is essential. Overtime should not be the default solution to meeting goals."
+  },
+  {
+    question: "What should a Scrum Master do if the team is resistant to Retrospectives?",
+    options: [
+      "Make Retrospectives mandatory",
+      "Experiment with different formats",
+      "Ignore the issue",
+      "Replace resistant team members"
+    ],
+    correct: [1],
+    type: "multi",
+    explanation: "Adapting Retrospectives to team needs fosters engagement. Forcing attendance or ignoring concerns is counterproductive."
+  },
+  {
+    question: "True or False: The Scrum Master should ensure the Product Owner prioritizes based on business value.",
     options: ["True", "False"],
     correct: 0,
     type: "boolean",
-    explanation: "The Scrum Master is accountable for ensuring Scrum is understood and enacted, including events."
+    explanation: "The Product Owner is responsible for backlog prioritization, and business value should guide decisions."
   },
   {
-    question: "Which are valid responsibilities of the Scrum Master during organizational change?",
+    question: "Which of the following are valid ways to foster psychological safety in a Scrum Team?",
     options: [
-      "Advocate for Agile values",
-      "Coach leaders on Scrum",
-      "Define HR policies",
-      "Support teams during transitions"
-    ],
-    correct: [0, 1, 3],
-    type: "multi",
-    explanation: "The Scrum Master is a change agent, but not an administrative role like HR policymaker."
-  },
-  {
-    question: "The team repeatedly misses their Sprint Goals. What should the Scrum Master examine first?",
-    options: [
-      "Sprint planning effectiveness",
-      "Developer engagement",
-      "Overcommitment patterns",
-      "Burnout or morale issues"
-    ],
-    correct: [0, 2, 3],
-    type: "multi",
-    explanation: "Goal misses may stem from poor planning, overcommitment, or team health — not simply performance."
-  },
-  {
-    question: "True or False: The Scrum Master can adjust the Sprint backlog during the Sprint if progress is low.",
-    options: ["True", "False"],
-    correct: 1,
-    type: "boolean",
-    explanation: "Only Developers own and adjust the Sprint backlog. The Scrum Master facilitates but doesn’t manage tasks."
-  },
-  {
-    question: "Which of the following actions show a lack of Scrum Master maturity?",
-    options: [
-      "Solving team problems unilaterally",
-      "Coaching team to resolve conflict",
-      "Regular stakeholder facilitation",
-      "Resisting retrospectives"
-    ],
-    correct: [0, 3],
-    type: "multi",
-    explanation: "Taking control and skipping key events shows a lack of trust in the team and the process."
-  },
-  {
-    question: "True or False: It’s okay for the Product Owner and Scrum Master to be the same person.",
-    options: ["True", "False"],
-    correct: 1,
-    type: "boolean",
-    explanation: "These roles have conflicting focuses and responsibilities. Separation ensures healthy tension and balance."
-  },
-  {
-    question: "What are signs that the Scrum Team has matured?",
-    options: [
-      "High self-management",
-      "Frequent escalations to Scrum Master",
-      "Ownership of Sprint Goals",
-      "Regular adaptation and learning"
-    ],
-    correct: [0, 2, 3],
-    type: "multi",
-    explanation: "A mature team owns goals and adapts regularly without external enforcement."
-  },
-  {
-    question: "A Developer often dominates conversations. What should the Scrum Master do?",
-    options: [
-      "Coach in 1:1 settings",
-      "Facilitate balanced dialogue in meetings",
-      "Remove the Developer",
-      "Assign speaking limits"
-    ],
-    correct: [0, 1],
-    type: "multi",
-    explanation: "Coaching and facilitation ensure inclusivity. Removal and limits are excessive and non-collaborative."
-  },
-  {
-    question: "True or False: Scrum Master success can be measured by team happiness scores.",
-    options: ["True", "False"],
-    correct: 1,
-    type: "boolean",
-    explanation: "While team morale matters, true success is measured by improved delivery, agility, and adaptability."
-  },
-  {
-    question: "Which of these demonstrate an Agile mindset?",
-    options: [
-      "Embracing change",
-      "Minimizing collaboration",
-      "Continuous learning",
-      "Fixed annual planning"
+      "Encourage open discussions",
+      "Punish mistakes",
+      "Support experimentation",
+      "Limit feedback opportunities"
     ],
     correct: [0, 2],
     type: "multi",
-    explanation: "Agility requires openness to change and continuous improvement. Isolation and rigid plans are anti-Agile."
+    explanation: "Psychological safety thrives on open dialogue and experimentation. Punishment and limiting feedback harm trust."
   }
 ];
+
