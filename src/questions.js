@@ -781,4 +781,47 @@ export const questions = [
   type: "multi",
   explanation: "Scrum Masters serve the broader organisation by identifying systemic issues and facilitating change across boundaries."
 },
+  {
+  question: "A stakeholder insists on having direct access to Developers daily. What is the most effective Scrum Master response?",
+  options: [
+    "Set up clear boundaries through Sprint events and PO involvement",
+    "Allow the stakeholder to join the Daily Scrum",
+    "Let the Developers decide how to manage the requests",
+    "Assign the Scrum Master as the stakeholder’s main contact"
+  ],
+  correct: [0],
+  type: "multi",
+  explanation: "Protecting team focus and maintaining role boundaries is key. Stakeholders collaborate via the Product Owner and Scrum events."
+},
+{
+  question: "True or False: Psychological safety within the Scrum Team is essential for continuous improvement.",
+  options: ["True", "False"],
+  correct: 0,
+  type: "boolean",
+  explanation: "Without psychological safety, team members will not feel safe to inspect, reflect, or challenge existing practices."
+},
+{
+  question: "How can a Scrum Master help improve flow without introducing rigid controls?",
+  options: [
+    "Introduce Work In Progress (WIP) limits and visualise bottlenecks",
+    "Assign daily targets for task completion",
+    "Create performance-based incentives",
+    "Ask the Product Owner to reduce backlog complexity"
+  ],
+  correct: [0],
+  type: "multi",
+  explanation: "Flow improvements come from system transparency—WIP limits and visibility aid this without creating rigidity."
+},
+{
+  question: "A newly promoted leader wants to ‘own’ all delivery processes. What is the Scrum Master’s best approach?",
+  options: [
+    "Coach the leader on Agile roles and decentralised ownership",
+    "Transfer ownership to the leader and step back",
+    "Make the Product Owner responsible for reporting to the leader",
+    "Let the Developers self-organise around the leader’s structure"
+  ],
+  correct: [0],
+  type: "multi",
+  explanation: "Scrum Masters coach leaders to support self-managed teams, not override them with command-and-control habits."
+},
 ];
