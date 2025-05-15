@@ -13,7 +13,7 @@ export default function App() {
   const [incorrectAnswers, setIncorrectAnswers] = useState(0);
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
-  const [timer, setTimer] = useState(60 * 60);
+  const [timer, setTimer] = useState(60 * 60); // 60 minutes
   const [answers, setAnswers] = useState([]);
   const [shuffled, setShuffled] = useState(false);
 
@@ -26,7 +26,29 @@ export default function App() {
   ];
   const [randomTip, setRandomTip] = useState(tips[0]);
 
+  const findDuplicateQuestions = (questions) => {
+    const duplicates = [];
+    const seen = new Map();
+    questions.forEach((q, index) => {
+      const key = `${q.question}|${(q.options || q.answers || []).join("|")}|${JSON.stringify(q.correct || q.correctAnswer)}`;
+      if (seen.has(key)) {
+        duplicates.push({ index, duplicateWith: seen.get(key), question: q });
+      } else {
+        seen.set(key, index);
+      }
+    });
+    return duplicates;
+  };
+
   useEffect(() => {
+    const duplicates = findDuplicateQuestions(originalQuestions);
+    if (duplicates.length > 0) {
+      console.log("Duplicates found:", duplicates);
+    }
+    const invalidQuestions = originalQuestions.filter(q => !q.explanation || typeof q.explanation !== "string");
+    if (invalidQuestions.length > 0) {
+      console.warn("Questions missing or invalid explanations:", invalidQuestions);
+    }
     if (mode !== "landing" && !shuffled) {
       const shuffledQuestions = [...originalQuestions].sort(() => Math.random() - 0.5);
       setQuestions(shuffledQuestions);
@@ -54,6 +76,22 @@ export default function App() {
   const isMultiCorrect = (q) => Array.isArray(q?.correct);
   const isBoolean = (q) => q?.type === "boolean";
 
+  const recordAnswer = (q, selected, isCorrect) => {
+    setAnswers((prev) => [
+      ...prev,
+      {
+        question: q.question,
+        selected,
+        correct: q.correct,
+        explanation: q.explanation,
+        options: q.options
+      }
+    ]);
+    isCorrect ? setCorrectAnswers((c) => c + 1) : setIncorrectAnswers((c) => c + 1);
+    setShowExplanation(true);
+    setRandomTip(tips[Math.floor(Math.random() * tips.length)]);
+  };
+
   const handleAnswer = (index) => {
     const q = questions[currentQuestion];
     if (!q) return;
@@ -68,19 +106,7 @@ export default function App() {
     } else {
       const isCorrect = index === q.correct;
       setSelectedOption([index]);
-      setShowExplanation(true);
-      isCorrect ? setCorrectAnswers((c) => c + 1) : setIncorrectAnswers((c) => c + 1);
-      setAnswers((prev) => [
-        ...prev,
-        {
-          question: q.question,
-          selected: [index],
-          correct: q.correct,
-          explanation: q.explanation,
-          options: q.options
-        }
-      ]);
-      setRandomTip(tips[Math.floor(Math.random() * tips.length)]);
+      recordAnswer(q, [index], isCorrect);
     }
   };
 
@@ -90,19 +116,7 @@ export default function App() {
     const isCorrect =
       selectedOption.length === q.correct.length &&
       selectedOption.every((val) => q.correct.includes(val));
-    isCorrect ? setCorrectAnswers((c) => c + 1) : setIncorrectAnswers((c) => c + 1);
-    setAnswers((prev) => [
-      ...prev,
-      {
-        question: q.question,
-        selected: selectedOption,
-        correct: q.correct,
-        explanation: q.explanation,
-        options: q.options
-      }
-    ]);
-    setShowExplanation(true);
-    setRandomTip(tips[Math.floor(Math.random() * tips.length)]);
+    recordAnswer(q, selectedOption, isCorrect);
   };
 
   const nextQuestion = () => {
@@ -122,7 +136,7 @@ export default function App() {
     setCorrectAnswers(0);
     setIncorrectAnswers(0);
     setQuizCompleted(false);
-    setTimer(60 * 30);
+    setTimer(60 * 60); // 60 minutes
     setAnswers([]);
     setShuffled(false);
   };
@@ -135,6 +149,9 @@ export default function App() {
 
   const percentage = Math.round((correctAnswers / questions.length) * 100);
   const currentQ = questions[currentQuestion] || null;
+  if (!currentQ && !quizCompleted) {
+    return <div>Error: No question available</div>;
+  }
   const isMulti = currentQ ? isMultiCorrect(currentQ) : false;
 
   if (mode === "landing") {
@@ -176,12 +193,12 @@ export default function App() {
       <div style={{ marginBottom: 10 }}>Question {currentQuestion + 1} of {questions.length}</div>
 
       <div style={{ backgroundColor: "#eee", height: 6, marginBottom: 20 }}>
-        <div style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%`, height: "100%", backgroundColor: "dodgerblue" }}></div>
+        <div style={{ width: `${((currentQuestion + 1) / questions.length * 100).toFixed(2)}%`, height: "100%", backgroundColor: "dodgerblue" }}></div>
       </div>
 
       {!quizCompleted && currentQ ? (
         <div>
-          <h3>{currentQ.question}</h3>
+          <h3>{currentQ.question} {isBoolean(currentQ) && <span>(True/False)</span>}</h3>
           {currentQ.options.map((option, index) => {
             const isSelected = selectedOption.includes(index);
             const isCorrect = isMulti ? currentQ.correct.includes(index) : index === currentQ.correct;
