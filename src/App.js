@@ -40,18 +40,31 @@ export default function App() {
   };
 
   useEffect(() => {
-    const duplicates = findDuplicateQuestions(originalQuestions);
+    console.log("useEffect triggered", {
+      mode,
+      shuffled,
+      originalQuestionsLength: originalQuestions ? originalQuestions.length : "undefined"
+    });
+    if (!originalQuestions || originalQuestions.length === 0) {
+      console.error("No questions loaded from questions.js");
+    }
+    const duplicates = findDuplicateQuestions(originalQuestions || []);
     if (duplicates.length > 0) {
       console.log("Duplicates found:", duplicates);
     }
-    const invalidQuestions = originalQuestions.filter(q => !q.explanation || typeof q.explanation !== "string");
+    const invalidQuestions = (originalQuestions || []).filter(q => !q.explanation || typeof q.explanation !== "string");
     if (invalidQuestions.length > 0) {
       console.warn("Questions missing or invalid explanations:", invalidQuestions);
     }
     if (mode !== "landing" && !shuffled) {
+      if (!originalQuestions || originalQuestions.length === 0) {
+        console.error("Cannot shuffle questions: originalQuestions is empty");
+        return;
+      }
       const shuffledQuestions = [...originalQuestions].sort(() => Math.random() - 0.5);
       setQuestions(shuffledQuestions);
       setShuffled(true);
+      console.log("Questions shuffled, new length:", shuffledQuestions.length);
     }
   }, [mode, shuffled]);
 
