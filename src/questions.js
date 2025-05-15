@@ -509,4 +509,166 @@ export const questions = [
     ],
     correct: [0],
     type: "multi",
-    explanation: "Relative estimation techniques help teams improve accuracy. Enforcing strict limits or ignoring estimation issues would
+    explanation: "Relative estimation techniques help teams improve accuracy. Enforcing strict limits or ignoring estimation issues would not be helpful."
+  },
+  {
+    question: "A Scrum Master notices that a Product Owner does not engage with the Developers. What should they do?",
+    options: [
+      "Coach the Product Owner on collaboration and backlog refinement",
+      "Take over backlog refinement responsibilities",
+      "Limit the Product Owner’s involvement to stakeholder communication",
+      "Ignore the issue since backlog management is outside the Scrum Master's role"
+    ],
+    correct: [0],
+    type: "multi",
+    explanation: "Encouraging active engagement ensures better backlog refinement and collaboration between the Product Owner and Developers."
+  },
+  {
+    question: "True or False: A Scrum Master should allow stakeholders to directly change the Sprint Backlog during the Sprint.",
+    options: ["True", "False"],
+    correct: 1,
+    type: "boolean",
+    explanation: "The Sprint Backlog is owned by the Developers. Changes should go through the Product Owner and be assessed for feasibility."
+  },
+  {
+    question: "A Scrum Team is struggling with integrating work across multiple teams. What should the Scrum Master do?",
+    options: [
+      "Encourage cross-team collaboration through Scrum of Scrums",
+      "Limit dependencies by restructuring the teams",
+      "Ignore integration issues since they are outside Scrum",
+      "Assign a dedicated integration team to handle the work"
+    ],
+    correct: [0],
+    type: "multi",
+    explanation: "Facilitating collaboration through Scrum of Scrums helps teams align their work and improve integration."
+  },
+  {
+    question: "A Scrum Master notices that the team lacks motivation during Sprints. What should they do?",
+    options: [
+      "Introduce gamification to make Sprints more engaging",
+      "Increase Sprint duration to reduce pressure",
+      "Explore underlying issues in a Retrospective",
+      "Assign more challenging tasks to motivate the team"
+    ],
+    correct: [0, 2],
+    type: "multi",
+    explanation: "Gamification and retrospectives address motivation by fostering engagement and identifying root causes."
+  },
+  {
+    question: "True or False: A Scrum Master should escalate all impediments to senior management immediately.",
+    options: ["True", "False"],
+    correct: 1,
+    type: "boolean",
+    explanation: "The Scrum Master should first attempt to resolve impediments within their scope and only escalate when necessary."
+  },
+  {
+    question: "Two Scrum Teams are blocked due to shared backend services. What is the Scrum Master’s first step?",
+    options: [
+      "Facilitate a cross-team workshop to identify dependencies and shared responsibilities.",
+      "Report the issue to the Steering Committee.",
+      "Assign a dedicated backend engineer to each team.",
+      "Let Product Owners sort it out."
+    ],
+    correct: [0],
+    type: "multi",
+    explanation: "Scrum Masters resolve impediments by increasing collaboration and transparency across teams (Scrum Guide)."
+  },
+  {
+    question: "A stakeholder requests a weekly burndown report. The team feels micromanaged. What’s your move?",
+    options: [
+      "Have a conversation with the stakeholder to understand their concerns and suggest a more agile-friendly reporting cadence.",
+      "Refuse the request — it violates Scrum values.",
+      "Ask the team to just do it and not worry.",
+      "Send them the raw metrics and let them interpret it."
+    ],
+    correct: [0],
+    type: "multi",
+    explanation: "Good Scrum Masters coach stakeholders as well as teams, fostering Agile-friendly communication rather than just saying 'no' (Scrum Guide)."
+  },
+  {
+    question: "Your developers keep turning to you for task assignments. What should you do?",
+    options: [
+      "Coach the team on self-management and facilitate a conversation about ownership in the next Retrospective.",
+      "Assign tasks yourself until they gain confidence.",
+      "Tell them it's not your job and walk away.",
+      "Ask the Product Owner to assign the work instead."
+    ],
+    correct: [0],
+    type: "multi",
+    explanation: "Teams must learn to self-organize. The Scrum Master guides this journey through coaching, not directing (Scrum Guide)."
+  },
+  {
+    question: "An executive is frustrated that Scrum is 'slowing everything down' and wants to skip Sprint Reviews. What do you do?",
+    options: [
+      "Schedule a 1:1 to explore their expectations and show how Sprint Reviews support business alignment.",
+      "Remove the Sprint Review for now and reintroduce it later.",
+      "Ask the Product Owner to deal with it.",
+      "Cancel the review and replace it with a written update."
+    ],
+    correct: [0],
+    type: "multi",
+    explanation: "Empirical process control requires inspection and adaptation. Sprint Reviews are essential for business alignment (Scrum Guide)."
+  },
+  {
+    question: "True or False: Scrum should not be used in early-stage startups because the work is too chaotic.",
+    options: ["True", "False"],
+    correct: 1,
+    type: "boolean",
+    explanation: "Scrum is designed for complex, rapidly changing environments and can bring focus and value even to early-stage startups (Scrum Guide)."
+  },
+  {
+    question: "What is the primary focus of the Sprint Review?",
+    options: [
+      "Assigning new tasks for the next Sprint",
+      "Inspecting the Increment and adapting the Product Backlog",
+      "Resolving team conflicts",
+      "Updating the Definition of Done"
+    ],
+    correct: [1],
+    type: "multi",
+    explanation: "The Sprint Review focuses on inspecting the Increment and adapting the Product Backlog based on feedback and new insights (Scrum Guide)."
+  },
+  {
+    question: "Who can cancel a Sprint if the Sprint Goal becomes obsolete?",
+    options: [
+      "The Scrum Master",
+      "The Product Owner",
+      "The Developers",
+      "The Stakeholders"
+    ],
+    correct: [1],
+    type: "multi",
+    explanation: "Only the Product Owner has the authority to cancel a Sprint when its goal is no longer relevant (Scrum Guide)."
+  },
+  {
+    question: "How should a Scrum Master address a team’s consistent overestimation of Sprint capacity?",
+    options: [
+      "Facilitate discussions to refine estimation techniques",
+      "Reduce the Sprint length",
+      "Assign fewer tasks to the team",
+      "Ignore the issue as it promotes safety"
+    ],
+    correct: [0],
+    type: "multi",
+    explanation: "Refining estimation through techniques like Planning Poker improves forecasting accuracy without altering Sprint structure (Scrum Guide)."
+  },
+  {
+    question: "True or False: The Daily Scrum must always follow the three-question format.",
+    options: ["True", "False"],
+    correct: 1,
+    type: "boolean",
+    explanation: "The three-question format is a suggestion, not a requirement. Developers can adapt the Daily Scrum format to inspect progress effectively (Scrum Guide)."
+  },
+  {
+    question: "What should a Scrum Master do if stakeholders bypass the Product Owner with direct requests to Developers?",
+    options: [
+      "Coach stakeholders to channel requests through the Product Owner",
+      "Allow the requests if they align with the Sprint Goal",
+      "Block all stakeholder communication during the Sprint",
+      "Escalate the issue to senior management"
+    ],
+    correct: [0],
+    type: "multi",
+    explanation: "The Product Owner manages the Product Backlog. Coaching stakeholders to respect this role maintains clarity and focus (Scrum Guide)."
+  }
+];
