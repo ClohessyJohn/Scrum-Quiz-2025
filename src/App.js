@@ -13,7 +13,7 @@ export default function App() {
   const [incorrectAnswers, setIncorrectAnswers] = useState(0);
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
-  const [timer, setTimer] = useState(60 * 30);
+  const [timer, setTimer] = useState(60 * 60);
   const [answers, setAnswers] = useState([]);
   const [shuffled, setShuffled] = useState(false);
 
