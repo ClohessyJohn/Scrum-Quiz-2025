@@ -624,7 +624,9 @@ export const questions = [
       "Resolving team conflicts",
       "Updating the Definition of Done"
     ],
- Appeals to the Product Owner to cancel a Sprint when its goal is no longer relevant (Scrum Guide)."
+    correct: [1],
+    type: "multi",
+    explanation: "The Sprint Review focuses on inspecting the Increment and adapting the Product Backlog based on feedback and new insights (Scrum Guide)."  
   },
   {
     question: "How should a Scrum Master address a team’s consistent overestimation of Sprint capacity?",
