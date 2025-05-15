@@ -40,18 +40,13 @@ export default function App() {
   };
 
   useEffect(() => {
-    console.log("useEffect triggered", {
-      mode,
-      shuffled,
-      originalQuestionsLength: originalQuestions ? originalQuestions.length : "undefined"
-    });
     if (!originalQuestions || originalQuestions.length === 0) {
       console.error("No questions loaded from questions.js");
       return;
     }
     const duplicates = findDuplicateQuestions(originalQuestions);
     if (duplicates.length > 0) {
-      console.log("Duplicates found:", duplicates);
+      console.warn("Duplicates found:", duplicates);
     }
     const invalidQuestions = originalQuestions.filter(q => !q.explanation || typeof q.explanation !== "string");
     if (invalidQuestions.length > 0) {
@@ -61,7 +56,6 @@ export default function App() {
       const shuffledQuestions = [...originalQuestions].sort(() => Math.random() - 0.5);
       setQuestions(shuffledQuestions);
       setShuffled(true);
-      console.log("Questions shuffled, new length:", shuffledQuestions.length);
     }
   }, [mode, shuffled]);
 
@@ -145,7 +139,7 @@ export default function App() {
     setCorrectAnswers(0);
     setIncorrectAnswers(0);
     setQuizCompleted(false);
-    setTimer(60 * 60); // 60 minutes
+    setTimer(60 * 60);
     setAnswers([]);
     setShuffled(false);
   };
@@ -158,9 +152,6 @@ export default function App() {
 
   const percentage = questions.length > 0 ? Math.round((correctAnswers / questions.length) * 100) : 0;
   const currentQ = questions[currentQuestion] || null;
-  if (!currentQ && !quizCompleted) {
-    return <div>Error: No question available</div>;
-  }
   const isMulti = currentQ ? isMultiCorrect(currentQ) : false;
 
   if (mode === "landing") {
@@ -169,9 +160,7 @@ export default function App() {
         <h1>Scrum Master Practice Quiz 2025</h1>
         <p>Designed by <strong>John Clohessy</strong> • Not affiliated with Scrum.org</p>
         <p>This quiz helps prepare for the PSM I certification by reinforcing Scrum concepts.</p>
-        <div style={{ marginTop: 30 }}>
-          <button onClick={() => setMode("practice")} className="primary-btn">Start Quiz</button>
-        </div>
+        <button onClick={() => setMode("practice")} className="primary-btn" style={{ marginTop: 30 }}>Start Quiz</button>
       </div>
     );
   }
@@ -185,7 +174,7 @@ export default function App() {
   }
 
   return (
-    <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ maxWidth: 800.ConcurrentModificationException margin: "auto", padding: 20 }}>
+    <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ maxWidth: 800, margin: "auto", padding: 20 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
         <h2>Scrum Master Practice Quiz 2025</h2>
         <div style={{ display: "flex", gap: 8 }}>
@@ -250,7 +239,7 @@ export default function App() {
               <p>
                 <strong>
                   {isMulti
-                    ? selectedOption.every((i) => currentQ.correct.includes(i)) && selectedOption.length === currentQ.correct.length
+                    ? selectedOption.sort().toString() === currentQ.correct.sort().toString()
                       ? "✅ Correct!"
                       : "❌ Incorrect!"
                     : selectedOption[0] === currentQ.correct
@@ -269,7 +258,10 @@ export default function App() {
           <p>✅ Correct Answers: {correctAnswers}</p>
           <p>❌ Incorrect Answers: {incorrectAnswers}</p>
           <p><strong>Your Score: {percentage}%</strong></p>
-          {percentage >= 85 ? <p style={{ color: "green" }}>⭐ You passed the quiz!</p> : <p style={{ color: "crimson" }}>❗ Keep practicing to reach 85%.</p>}
+          {percentage >= 85
+            ? <p style={{ color: "green" }}>⭐ You passed the quiz!</p>
+            : <p style={{ color: "crimson" }}>❗ Keep practicing to reach 85%.</p>
+          }
 
           <h3 style={{ textAlign: "left", marginTop: 40 }}>🔹 Review Answers</h3>
           {answers.map((ans, idx) => (
@@ -290,3 +282,4 @@ export default function App() {
     </div>
   );
 }
+
