@@ -671,4 +671,114 @@ export const questions = [
     type: "multi",
     explanation: "The Product Owner manages the Product Backlog. Coaching stakeholders to respect this role maintains clarity and focus (Scrum Guide)."
   },
+  {
+  question: "A high-performing Scrum Team is disrupted by a new stakeholder introducing ad-hoc features mid-Sprint. What’s the Scrum Master’s best response?",
+  options: [
+    "Cancel the Sprint and reprioritize",
+    "Facilitate a conversation between the Product Owner and stakeholder",
+    "Allow Developers to decide whether to accept the work",
+    "Create a new backlog for stakeholder requests"
+  ],
+  correct: [1],
+  type: "multi",
+  explanation: "Facilitating collaboration helps the PO manage stakeholder expectations and uphold Sprint integrity. Cancelling the Sprint or letting Developers decide undermines Scrum roles."
+},
+  {
+  question: "Your Scrum Team is adopting flow metrics like Cycle Time and Throughput. What is the Scrum Master's responsibility?",
+  options: [
+    "Coach the team on interpreting metrics to drive improvement",
+    "Share metrics only with leadership to avoid pressure",
+    "Ignore flow metrics—they're not part of Scrum",
+    "Use metrics to compare team performance across departments"
+  ],
+  correct: [0],
+  type: "multi",
+  explanation: "Scrum Masters support empirical practices. Coaching the team to use metrics for learning and improvement is key—not for performance comparison."
+},
+{
+  question: "A team is struggling with splitting Product Backlog Items into smaller increments. What should the Scrum Master do?",
+  options: [
+    "Facilitate a backlog refinement workshop with slicing patterns",
+    "Assign tasks to Developers to make progress",
+    "Let the team handle it without interference",
+    "Encourage skipping Sprint Goals if items are too large"
+  ],
+  correct: [0],
+  type: "multi",
+  explanation: "Facilitating techniques like vertical slicing or INVEST criteria helps teams decompose work without enforcing control."
+},
+{
+  question: "During a team retrospective, several members raise concerns about technical debt slowing progress. What’s the best Scrum Master response?",
+  options: [
+    "Coach the team and Product Owner on prioritizing technical debt",
+    "Defer the topic to the next quarterly planning cycle",
+    "Tell the Developers to handle it silently between Sprints",
+    "Instruct QA to increase regression testing"
+  ],
+  correct: [0],
+  type: "multi",
+  explanation: "Addressing technical debt collaboratively with the Product Owner ensures it’s visible and prioritised correctly."
+},
+{
+  question: "True or False: The Scrum Master should ensure Definition of Done evolves as the team matures.",
+  options: ["True", "False"],
+  correct: 0,
+  type: "boolean",
+  explanation: "An evolving Definition of Done supports higher quality and agility. The Scrum Master facilitates continuous improvement of working agreements."
+},
+{
+  question: "A team is using Scrum within a scaled framework (like SAFe or LeSS). What should the Scrum Master prioritise?",
+  options: [
+    "Maintaining core Scrum principles within the scaled structure",
+    "Delegating all planning to the Release Train Engineer",
+    "Focusing only on team-level ceremonies",
+    "Adapting Scrum roles to match project manager expectations"
+  ],
+  correct: [0],
+  type: "multi",
+  explanation: "Even in scaled environments, the Scrum Master upholds Scrum values and principles while adapting to the broader context."
+},
+  {
+  question: "What should a Scrum Master do when team members are frequently pulled into unrelated organisational tasks during the Sprint?",
+  options: [
+    "Coach stakeholders on the cost of interruptions to Sprint Goals",
+    "Extend the Sprint to make up for the lost time",
+    "Let the Product Owner replan mid-Sprint",
+    "Accept the disruptions as part of a flexible process"
+  ],
+  correct: [0],
+  type: "multi",
+  explanation: "The Scrum Master protects the team from disruptions and helps the organisation understand the importance of Sprint focus."
+},
+{
+  question: "True or False: A Scrum Master facilitates organisational agility by supporting both teams and leadership.",
+  options: ["True", "False"],
+  correct: 0,
+  type: "boolean",
+  explanation: "Scrum Masters work across the organisation to improve Agile maturity—not just with Developers or the Scrum Team."
+},
+{
+  question: "A Scrum Team wants to adopt Kanban-style metrics within their Sprint framework. How should the Scrum Master respond?",
+  options: [
+    "Support the integration to improve flow visibility",
+    "Discourage it as it contradicts Scrum rules",
+    "Replace the Sprint Backlog with a Kanban board",
+    "Switch fully from Scrum to Kanban"
+  ],
+  correct: [0],
+  type: "multi",
+  explanation: "Scrum allows integration of complementary practices like Kanban when they enhance transparency and delivery, without changing Scrum’s core."
+},
+{
+  question: "The team has identified systemic organisational blockers during multiple Retrospectives. What should the Scrum Master do?",
+  options: [
+    "Escalate patterns to leadership and facilitate cross-team dialogue",
+    "Ignore them and focus only on internal team improvements",
+    "Ask the Product Owner to address them",
+    "Limit future retrospectives to team topics only"
+  ],
+  correct: [0],
+  type: "multi",
+  explanation: "Scrum Masters serve the broader organisation by identifying systemic issues and facilitating change across boundaries."
+},
 ];
