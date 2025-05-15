@@ -5,7 +5,7 @@ This is a simple, interactive web app built using **React** that helps users pre
 ---
 
 ## 📦 Features
-- 80 real-world Scrum Master-style questions
+- 40 real-world Scrum Master-style questions
 - Instant feedback (Correct/Incorrect)
 - Explanations after each answer
 - Final results summary
