@@ -772,7 +772,7 @@ export const questions = [
   ],
   "correctAnswer": "Facilitate a cross-team workshop to identify dependencies and shared responsibilities.",
   "tip": "Scrum Masters resolve impediments by increasing collaboration and transparency across teams."
-}
+},
 {
   "question": "A stakeholder requests a weekly burndown report. The team feels micromanaged. What’s your move?",
   "type": "multiple",
@@ -784,7 +784,7 @@ export const questions = [
   ],
   "correctAnswer": "Have a conversation with the stakeholder to understand their concerns and suggest a more agile-friendly reporting cadence.",
   "tip": "Good Scrum Masters coach stakeholders as well as teams — not just say 'no'."
-}
+},
 {
   "question": "Your developers keep turning to you for task assignments. What should you do?",
   "type": "multiple",
@@ -796,7 +796,7 @@ export const questions = [
   ],
   "correctAnswer": "Coach the team on self-management and facilitate a conversation about ownership in the next Retrospective.",
   "tip": "Teams must learn to self-organize — you guide that journey, not direct it."
-}
+},
 {
   "question": "An executive is frustrated that Scrum is 'slowing everything down' and wants to skip Sprint Reviews. What do you do?",
   "type": "multiple",
@@ -808,7 +808,7 @@ export const questions = [
   ],
   "correctAnswer": "Schedule a 1:1 to explore their expectations and show how Sprint Reviews support business alignment.",
   "tip": "Empirical process control only works when inspection and adaptation are present — Sprint Reviews are essential."
-}
+},
 {
   "question": "True or False: Scrum should not be used in early-stage startups because the work is too chaotic.",
   "type": "boolean",
