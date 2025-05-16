@@ -25,57 +25,6 @@ export default function App() {
   ];
   const [randomTip, setRandomTip] = useState(tips[0]);
 
-  const findDuplicateQuestions = (questions) => {
-    const duplicates = [];
-    const seen = new Map();
-    questions.forEach((q, index) => {
-      const key = `${q.question}|${(q.options || q.answers || []).join("|")}|${JSON.stringify(q.correct || q.correctAnswer)}`;
-      if (seen.has(key)) {
-        duplicates.push({ index, duplicateWith: seen.get(key), question: q });
-      } else {
-        seen.set(key, index);
-      }
-    });
-    return duplicates;
-  };
-
-  useEffect(() => {
-    if (!originalQuestions || originalQuestions.length === 0) {
-      console.error("No questions loaded from questions.js");
-      return;
-    }
-    const duplicates = findDuplicateQuestions(originalQuestions);
-    if (duplicates.length > 0) {
-      console.warn("Duplicates found:", duplicates);
-    }
-    const invalidQuestions = originalQuestions.filter(q => !q.explanation || typeof q.explanation !== "string");
-    if (invalidQuestions.length > 0) {
-      console.warn("Questions missing or invalid explanations:", invalidQuestions);
-    }
-    if (mode !== "landing" && !shuffled) {
-      const shuffledQuestions = [...originalQuestions].sort(() => Math.random() - 0.5);
-      setQuestions(shuffledQuestions);
-      setShuffled(true);
-    }
-  }, [mode, shuffled]);
-
-  useEffect(() => {
-    let interval;
-    if (mode === "test" && !quizCompleted) {
-      interval = setInterval(() => {
-        setTimer((prev) => {
-          if (prev <= 1) {
-            clearInterval(interval);
-            setQuizCompleted(true);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [mode, quizCompleted]);
-
   const isMultiCorrect = (q) => Array.isArray(q?.correct);
   const isBoolean = (q) => q?.type === "boolean";
 
@@ -97,12 +46,11 @@ export default function App() {
 
   const handleAnswer = (index) => {
     const q = questions[currentQuestion];
-    if (!q) return;
-    const isMulti = isMultiCorrect(q);
+    if (!q || showExplanation) return;
 
+    const isMulti = isMultiCorrect(q);
     if (isMulti) {
-      const alreadySelected = selectedOption.includes(index);
-      const updated = alreadySelected
+      const updated = selectedOption.includes(index)
         ? selectedOption.filter((i) => i !== index)
         : [...selectedOption, index];
       setSelectedOption(updated);
@@ -115,7 +63,7 @@ export default function App() {
 
   const submitMultiAnswer = () => {
     const q = questions[currentQuestion];
-    if (!q) return;
+    if (!q || showExplanation) return;
     const isCorrect =
       selectedOption.length === q.correct.length &&
       selectedOption.every((val) => q.correct.includes(val));
@@ -150,7 +98,34 @@ export default function App() {
     return `${m}:${s}`;
   };
 
-  const percentage = questions.length > 0 ? Math.round((correctAnswers / questions.length) * 100) : 0;
+  useEffect(() => {
+    if (!originalQuestions || originalQuestions.length === 0) return;
+    if (mode !== "landing" && !shuffled) {
+      const shuffledQuestions = [...originalQuestions].sort(() => Math.random() - 0.5);
+      setQuestions(shuffledQuestions);
+      setShuffled(true);
+    }
+  }, [mode, shuffled]);
+
+  useEffect(() => {
+    let interval;
+    if (mode === "test" && !quizCompleted) {
+      interval = setInterval(() => {
+        setTimer((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            setQuizCompleted(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [mode, quizCompleted]);
+
+  const percentage =
+    questions.length > 0 ? Math.round((correctAnswers / questions.length) * 100) : 0;
   const currentQ = questions[currentQuestion] || null;
   const isMulti = currentQ ? isMultiCorrect(currentQ) : false;
 
@@ -196,10 +171,21 @@ export default function App() {
 
       {!quizCompleted && currentQ ? (
         <div>
-          <h3>{currentQ.question} {isBoolean(currentQ) && <span>(True/False)</span>}</h3>
+          <h3>
+            {currentQ.question}
+            {isBoolean(currentQ) && <span> (True/False)</span>}
+          </h3>
+
+          {isMulti && !showExplanation && (
+            <p style={{ fontStyle: "italic", color: "#666", marginBottom: "1em" }}>
+              Select all that apply
+            </p>
+          )}
+
           {currentQ.options.map((option, index) => {
             const isSelected = selectedOption.includes(index);
             const isCorrect = isMulti ? currentQ.correct.includes(index) : index === currentQ.correct;
+
             let bg = "";
             let fontWeight = "normal";
             if (!showExplanation && isSelected) {
@@ -209,6 +195,7 @@ export default function App() {
               bg = isCorrect ? "lightgreen" : "salmon";
               fontWeight = "bold";
             }
+
             return (
               <button
                 key={index}
@@ -223,7 +210,7 @@ export default function App() {
                   fontSize: "1rem",
                   textAlign: "left"
                 }}
-                disabled={showExplanation && !isMulti}
+                disabled={showExplanation}
               >
                 <strong>{String.fromCharCode(65 + index)}.</strong> {option}
               </button>
@@ -282,4 +269,3 @@ export default function App() {
     </div>
   );
 }
-
