@@ -25,10 +25,32 @@ export default function App() {
   ];
   const [randomTip, setRandomTip] = useState(tips[0]);
 
+  const findDuplicateQuestions = (questions) => {
+    const duplicates = [];
+    const seen = new Map();
+    questions.forEach((q, index) => {
+      const key = `${q.question}|${(q.options || []).join("|")}|${JSON.stringify(q.correct)}`;
+      if (seen.has(key)) {
+        duplicates.push({ index, duplicateWith: seen.get(key), question: q });
+      } else {
+        seen.set(key, index);
+      }
+    });
+    return duplicates;
+  };
+
   useEffect(() => {
     if (!originalQuestions || originalQuestions.length === 0) {
-      console.error("No questions loaded");
+      console.error("No questions loaded from questions.js");
       return;
+    }
+    const duplicates = findDuplicateQuestions(originalQuestions);
+    if (duplicates.length > 0) {
+      console.warn("Duplicates found:", duplicates);
+    }
+    const invalidQuestions = originalQuestions.filter(q => !q.explanation || typeof q.explanation !== "string");
+    if (invalidQuestions.length > 0) {
+      console.warn("Questions missing or invalid explanations:", invalidQuestions);
     }
     if (mode !== "landing" && !shuffled) {
       const shuffledQuestions = [...originalQuestions].sort(() => Math.random() - 0.5);
@@ -53,43 +75,15 @@ export default function App() {
     }
     return () => clearInterval(interval);
   }, [mode, quizCompleted]);
-
   const isMultiCorrect = (q) => Array.isArray(q?.correct);
   const isBoolean = (q) => q?.type === "boolean";
 
-  const hasAnswered = (index) =>
-    answers.some((ans) => ans.question === questions[index]?.question);
-
-  const handleAnswer = (index) => {
-    const q = questions[currentQuestion];
-    if (!q) return;
-    const isMulti = isMultiCorrect(q);
-
-    if (isMulti) {
-      const alreadySelected = selectedOption.includes(index);
-      const updated = alreadySelected
-        ? selectedOption.filter((i) => i !== index)
-        : [...selectedOption, index];
-      setSelectedOption(updated);
-    } else {
-      setSelectedOption([index]);
-    }
-  };
-
-  const recordAnswer = () => {
-    const q = questions[currentQuestion];
-    if (!q || selectedOption.length === 0) return;
-
-    const isMulti = isMultiCorrect(q);
-    const isCorrect = isMulti
-      ? selectedOption.sort().toString() === q.correct.sort().toString()
-      : selectedOption[0] === q.correct;
-
+  const recordAnswer = (q, selected, isCorrect) => {
     setAnswers((prev) => [
       ...prev,
       {
         question: q.question,
-        selected: selectedOption,
+        selected,
         correct: q.correct,
         explanation: q.explanation,
         options: q.options
@@ -98,6 +92,32 @@ export default function App() {
     isCorrect ? setCorrectAnswers((c) => c + 1) : setIncorrectAnswers((c) => c + 1);
     setShowExplanation(true);
     setRandomTip(tips[Math.floor(Math.random() * tips.length)]);
+  };
+
+  const handleAnswer = (index) => {
+    const q = questions[currentQuestion];
+    if (!q || showExplanation) return;
+    const isMulti = isMultiCorrect(q);
+
+    if (isMulti) {
+      const updated = selectedOption.includes(index)
+        ? selectedOption.filter((i) => i !== index)
+        : [...selectedOption, index];
+      setSelectedOption(updated);
+    } else {
+      const isCorrect = index === q.correct;
+      setSelectedOption([index]);
+      recordAnswer(q, [index], isCorrect);
+    }
+  };
+
+  const submitMultiAnswer = () => {
+    const q = questions[currentQuestion];
+    if (!q || selectedOption.length === 0) return;
+    const isCorrect =
+      selectedOption.length === q.correct.length &&
+      selectedOption.every((val) => q.correct.includes(val));
+    recordAnswer(q, selectedOption, isCorrect);
   };
 
   const nextQuestion = () => {
@@ -110,12 +130,11 @@ export default function App() {
     }
   };
 
-  const goBack = () => {
+  const previousQuestion = () => {
     if (currentQuestion > 0) {
       setCurrentQuestion((prev) => prev - 1);
+      setSelectedOption([]);
       setShowExplanation(false);
-      const previous = answers.find(ans => ans.question === questions[currentQuestion - 1]?.question);
-      setSelectedOption(previous ? previous.selected : []);
     }
   };
 
@@ -137,17 +156,23 @@ export default function App() {
     return `${m}:${s}`;
   };
 
-  const percentage = questions.length > 0 ? Math.round((correctAnswers / questions.length) * 100) : 0;
+  const percentage = questions.length > 0
+    ? Math.round((correctAnswers / questions.length) * 100)
+    : 0;
   const currentQ = questions[currentQuestion] || null;
   const isMulti = currentQ ? isMultiCorrect(currentQ) : false;
-
   if (mode === "landing") {
     return (
       <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ textAlign: "center", padding: 40 }}>
         <h1>Scrum Master Practice Quiz 2025</h1>
-        <p>Designed by <strong>John Clohessy</strong> • Not affiliated with Scrum.org</p>
-        <p>This quiz helps prepare for the PSM I certification by reinforcing Scrum concepts.</p>
-        <button onClick={() => setMode("practice")} className="primary-btn" style={{ marginTop: 30 }}>Start Quiz</button>
+        <p><strong>Designed by John Clohessy</strong></p>
+        <p>
+          This tool is intended for independent learning and practice. It is not affiliated with, endorsed by, or associated with Scrum.org or any other certifying body.
+        </p>
+        <p>This quiz helps prepare for the PSM I certification by reinforcing Scrum concepts and practical application.</p>
+        <button onClick={() => setMode("practice")} className="primary-btn" style={{ marginTop: 30 }}>
+          Start Quiz
+        </button>
       </div>
     );
   }
@@ -181,7 +206,7 @@ export default function App() {
         <div style={{ width: `${((currentQuestion + 1) / questions.length * 100).toFixed(2)}%`, height: "100%", backgroundColor: "dodgerblue" }}></div>
       </div>
 
-      {!quizCompleted && currentQ && (
+      {!quizCompleted && currentQ ? (
         <div>
           <h3>{currentQ.question} {isBoolean(currentQ) && <span>(True/False)</span>}</h3>
 
@@ -196,7 +221,6 @@ export default function App() {
             const isCorrect = isMulti ? currentQ.correct.includes(index) : index === currentQ.correct;
             let bg = "";
             let fontWeight = "normal";
-
             if (!showExplanation && isSelected) {
               bg = "#f0f0f0";
               fontWeight = "bold";
@@ -204,7 +228,6 @@ export default function App() {
               bg = isCorrect ? "lightgreen" : "salmon";
               fontWeight = "bold";
             }
-
             return (
               <button
                 key={index}
@@ -213,7 +236,7 @@ export default function App() {
                   display: "block",
                   margin: "10px 0",
                   backgroundColor: bg,
-                  fontWeight: fontWeight,
+                  fontWeight,
                   padding: 10,
                   border: "1px solid #ccc",
                   fontSize: "1rem",
@@ -226,16 +249,26 @@ export default function App() {
             );
           })}
 
-          {!showExplanation && (
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 20 }}>
+            <button onClick={previousQuestion}>← Back</button>
+
+            {isMulti && !showExplanation && (
+              <button
+                onClick={submitMultiAnswer}
+                className="primary-btn"
+                disabled={selectedOption.length === 0}
+              >
+                Submit Answer
+              </button>
+            )}
+
             <button
-              onClick={recordAnswer}
-              className="primary-btn"
-              style={{ marginTop: 10 }}
-              disabled={selectedOption.length === 0}
+              onClick={nextQuestion}
+              disabled={!showExplanation}
             >
-              Submit Answer
+              Next →
             </button>
-          )}
+          </div>
 
           {showExplanation && (
             <div className="explanation-box">
@@ -253,22 +286,8 @@ export default function App() {
               <p><strong>Tip:</strong> 💡 {randomTip}</p>
             </div>
           )}
-
-          {showExplanation && (
-            <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
-              <button onClick={goBack} disabled={currentQuestion === 0}>← Back</button>
-              <button
-                onClick={nextQuestion}
-                disabled={currentQuestion === questions.length - 1}
-              >
-                Next →
-              </button>
-            </div>
-          )}
         </div>
-      )}
-
-      {quizCompleted && (
+      ) : quizCompleted ? (
         <div style={{ textAlign: "center" }}>
           <h2>✅ Quiz Completed!</h2>
           <p>✅ Correct Answers: {correctAnswers}</p>
@@ -294,8 +313,7 @@ export default function App() {
           ))}
           <button onClick={resetQuiz}>Restart Quiz</button>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
-
