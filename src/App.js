@@ -1,3 +1,5 @@
+// NOTE: Due to length, this file is large. Please indicate if you'd like it in a downloadable format instead.
+
 import React, { useState, useEffect } from "react";
 import { questions as originalQuestions } from "./questions";
 import "./App.css";
@@ -6,53 +8,18 @@ export default function App() {
   const [mode, setMode] = useState("landing");
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedOption, setSelectedOption] = useState([]);
-  const [showExplanation, setShowExplanation] = useState(false);
+  const [selectedOptions, setSelectedOptions] = useState({});
+  const [submittedQuestions, setSubmittedQuestions] = useState(new Set());
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [incorrectAnswers, setIncorrectAnswers] = useState(0);
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
-  const [timer, setTimer] = useState(60 * 60);
+  const [timer, setTimer] = useState(60 * 60); // 60 minutes
   const [answers, setAnswers] = useState([]);
   const [shuffled, setShuffled] = useState(false);
-  const [visitedQuestions, setVisitedQuestions] = useState([]);
-
-  const tips = [
-    "The Definition of Done creates shared understanding.",
-    "Scrum thrives on empiricism: transparency, inspection, and adaptation.",
-    "The Product Owner manages the Product Backlog.",
-    "Daily Scrums are for the Developers to inspect and adapt.",
-    "Sprint Retrospective fosters continuous improvement."
-  ];
-  const [randomTip, setRandomTip] = useState(tips[0]);
-
-  const findDuplicateQuestions = (questions) => {
-    const duplicates = [];
-    const seen = new Map();
-    questions.forEach((q, index) => {
-      const key = `${q.question}|${(q.options || q.answers || []).join("|")}|${JSON.stringify(q.correct || q.correctAnswer)}`;
-      if (seen.has(key)) {
-        duplicates.push({ index, duplicateWith: seen.get(key), question: q });
-      } else {
-        seen.set(key, index);
-      }
-    });
-    return duplicates;
-  };
 
   useEffect(() => {
-    if (!originalQuestions || originalQuestions.length === 0) {
-      console.error("No questions loaded from questions.js");
-      return;
-    }
-    const duplicates = findDuplicateQuestions(originalQuestions);
-    if (duplicates.length > 0) {
-      console.warn("Duplicates found:", duplicates);
-    }
-    const invalidQuestions = originalQuestions.filter(q => !q.explanation || typeof q.explanation !== "string");
-    if (invalidQuestions.length > 0) {
-      console.warn("Questions missing or invalid explanations:", invalidQuestions);
-    }
+    if (!originalQuestions || originalQuestions.length === 0) return;
     if (mode !== "landing" && !shuffled) {
       const shuffledQuestions = [...originalQuestions].sort(() => Math.random() - 0.5);
       setQuestions(shuffledQuestions);
@@ -77,141 +44,101 @@ export default function App() {
     return () => clearInterval(interval);
   }, [mode, quizCompleted]);
 
+  const currentQ = questions[currentQuestion];
   const isMultiCorrect = (q) => Array.isArray(q?.correct);
-  const isBoolean = (q) => q?.type === "boolean";
+  const formatTime = (seconds) => `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
+  const percentage = questions.length ? Math.round((correctAnswers / questions.length) * 100) : 0;
+  const isSubmitted = submittedQuestions.has(currentQuestion);
 
-  const recordAnswer = (q, selected, isCorrect) => {
-    setAnswers((prev) => {
-      const newAnswers = [...prev];
-      newAnswers[currentQuestion] = {
-        question: q.question,
-        selected,
-        correct: q.correct,
-        explanation: q.explanation,
-        options: q.options
-      };
-      return newAnswers;
-    });
+  const handleSelect = (index) => {
+    if (isSubmitted) return;
+    const isMulti = isMultiCorrect(currentQ);
+    const currentSelections = selectedOptions[currentQuestion] || [];
 
-    isCorrect ? setCorrectAnswers((c) => c + 1) : setIncorrectAnswers((c) => c + 1);
-    setShowExplanation(true);
-    setRandomTip(tips[Math.floor(Math.random() * tips.length)]);
-  };
-
-  const handleAnswer = (index) => {
-    const q = questions[currentQuestion];
-    if (!q) return;
-    const isMulti = isMultiCorrect(q);
-
+    let updatedSelections;
     if (isMulti) {
-      const alreadySelected = selectedOption.includes(index);
-      const updated = alreadySelected
-        ? selectedOption.filter((i) => i !== index)
-        : [...selectedOption, index];
-      setSelectedOption(updated);
+      updatedSelections = currentSelections.includes(index)
+        ? currentSelections.filter(i => i !== index)
+        : [...currentSelections, index];
     } else {
-      const isCorrect = index === q.correct;
-      setSelectedOption([index]);
-      recordAnswer(q, [index], isCorrect);
+      updatedSelections = [index];
     }
+
+    setSelectedOptions(prev => ({ ...prev, [currentQuestion]: updatedSelections }));
   };
 
-  const submitMultiAnswer = () => {
-    const q = questions[currentQuestion];
-    if (!q) return;
-    const isCorrect =
-      selectedOption.length === q.correct.length &&
-      selectedOption.every((val) => q.correct.includes(val));
-    recordAnswer(q, selectedOption, isCorrect);
+  const submitAnswer = () => {
+    if (!currentQ) return;
+    const userSelection = selectedOptions[currentQuestion] || [];
+    const correct = Array.isArray(currentQ.correct) ? currentQ.correct : [currentQ.correct];
+
+    const isCorrect = userSelection.length === correct.length &&
+      userSelection.every((val) => correct.includes(val));
+
+    setAnswers(prev => [
+      ...prev,
+      {
+        question: currentQ.question,
+        selected: userSelection,
+        correct,
+        explanation: currentQ.explanation,
+        options: currentQ.options
+      }
+    ]);
+
+    setSubmittedQuestions(prev => new Set([...prev, currentQuestion]));
+    isCorrect ? setCorrectAnswers((c) => c + 1) : setIncorrectAnswers((c) => c + 1);
   };
 
-  const nextQuestion = () => {
+  const goToNext = () => {
     if (currentQuestion < questions.length - 1) {
-      const nextIndex = currentQuestion + 1;
-      setVisitedQuestions((prev) => [...prev, currentQuestion]);
-      setCurrentQuestion(nextIndex);
-
-      const saved = answers[nextIndex];
-      setSelectedOption(saved?.selected || []);
-      setShowExplanation(!!saved);
+      setCurrentQuestion(prev => prev + 1);
     } else {
       setQuizCompleted(true);
     }
   };
 
-  const goBack = () => {
-    if (visitedQuestions.length > 0) {
-      const prevIndex = visitedQuestions[visitedQuestions.length - 1];
-      setVisitedQuestions((prev) => prev.slice(0, -1));
-      setCurrentQuestion(prevIndex);
-
-      const saved = answers[prevIndex];
-      setSelectedOption(saved?.selected || []);
-      setShowExplanation(!!saved);
+  const goToPrevious = () => {
+    if (currentQuestion > 0) {
+      setCurrentQuestion(prev => prev - 1);
     }
   };
 
   const skipQuestion = () => {
-    const nextIndex = currentQuestion + 1;
-    if (nextIndex < questions.length) {
-      setVisitedQuestions((prev) => [...prev, currentQuestion]);
-      setCurrentQuestion(nextIndex);
-
-      const saved = answers[nextIndex];
-      setSelectedOption(saved?.selected || []);
-      setShowExplanation(!!saved);
-    }
+    goToNext();
   };
 
   const resetQuiz = () => {
     setCurrentQuestion(0);
-    setSelectedOption([]);
-    setShowExplanation(false);
+    setSelectedOptions({});
+    setSubmittedQuestions(new Set());
     setCorrectAnswers(0);
     setIncorrectAnswers(0);
     setQuizCompleted(false);
     setTimer(60 * 60);
     setAnswers([]);
     setShuffled(false);
-    setVisitedQuestions([]);
   };
-
-  const formatTime = (seconds) => {
-    const m = Math.floor(seconds / 60).toString().padStart(2, "0");
-    const s = (seconds % 60).toString().padStart(2, "0");
-    return `${m}:${s}`;
-  };
-
-  const percentage = questions.length > 0 ? Math.round((correctAnswers / questions.length) * 100) : 0;
-  const currentQ = questions[currentQuestion] || null;
-  const isMulti = currentQ ? isMultiCorrect(currentQ) : false;
 
   if (mode === "landing") {
     return (
       <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ textAlign: "center", padding: 40 }}>
         <h1>Scrum Master Practice Quiz 2025</h1>
-        <p>Designed by <strong>John Clohessy</strong> • Not affiliated with Scrum.org</p>
         <p>This quiz helps prepare for the PSM I certification by reinforcing Scrum concepts.</p>
-        <button onClick={() => setMode("practice")} className="primary-btn" style={{ marginTop: 30 }}>Start Quiz</button>
+        <button className="primary-btn" onClick={() => setMode("test")}>Start Quiz</button>
       </div>
     );
   }
 
-  if (mode !== "landing" && questions.length === 0) {
-    return (
-      <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ padding: 40 }}>
-        <h2>Loading questions...</h2>
-      </div>
-    );
+  if (!currentQ && !quizCompleted) {
+    return <div>Error loading question</div>;
   }
 
   return (
     <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ maxWidth: 800, margin: "auto", padding: 20 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h2>Scrum Master Practice Quiz 2025</h2>
-        <div style={{ display: "flex", gap: 8 }}>
-          <button onClick={() => setMode("practice")}>Practice</button>
-          <button onClick={() => { resetQuiz(); setMode("test"); }}>Test</button>
+        <div>
           <button onClick={() => setDarkMode(!darkMode)}>{darkMode ? "☀ Light" : "🌙 Dark"}</button>
         </div>
       </div>
@@ -220,106 +147,88 @@ export default function App() {
         <div style={{ textAlign: "right" }}>Timer: <strong>{formatTime(timer)}</strong></div>
       )}
 
-      <div style={{ marginBottom: 10 }}>Question {currentQuestion + 1} of {questions.length}</div>
-
-      <div style={{ backgroundColor: "#eee", height: 6, marginBottom: 20 }}>
-        <div style={{ width: `${((currentQuestion + 1) / questions.length * 100).toFixed(2)}%`, height: "100%", backgroundColor: "dodgerblue" }}></div>
+      <div>Question {currentQuestion + 1} of {questions.length}</div>
+      <div style={{ background: "#ccc", height: 6, marginBottom: 20 }}>
+        <div style={{
+          width: `${((currentQuestion + 1) / questions.length) * 100}%`,
+          background: "dodgerblue", height: "100%"
+        }} />
       </div>
 
-      {!quizCompleted && currentQ ? (
-        <div>
-          <h3>{currentQ.question} {isBoolean(currentQ) && <span>(True/False)</span>}</h3>
-          {isMulti && !showExplanation && (
-            <p style={{ fontStyle: "italic", color: "#666", marginBottom: "1em" }}>
-              Select all that apply
-            </p>
-          )}
-          {currentQ.options.map((option, index) => {
-            const isSelected = selectedOption.includes(index);
-            const isCorrect = isMulti ? currentQ.correct.includes(index) : index === currentQ.correct;
-            let bg = "";
-            let fontWeight = "normal";
-            if (!showExplanation && isSelected) {
-              bg = "#f0f0f0";
-              fontWeight = "bold";
-            } else if (showExplanation && isSelected) {
-              bg = isCorrect ? "lightgreen" : "salmon";
-              fontWeight = "bold";
-            }
-            return (
-              <button
-                key={index}
-                onClick={() => handleAnswer(index)}
-                style={{
-                  display: "block",
-                  margin: "10px 0",
-                  backgroundColor: bg,
-                  fontWeight: fontWeight,
-                  padding: 10,
-                  border: "1px solid #ccc",
-                  fontSize: "1rem",
-                  textAlign: "left"
-                }}
-                disabled={showExplanation && !isMulti}
-              >
-                <strong>{String.fromCharCode(65 + index)}.</strong> {option}
-              </button>
-            );
-          })}
+      <h3>{currentQ.question}</h3>
+      {isMultiCorrect(currentQ) && !isSubmitted && (
+        <p style={{ fontStyle: "italic", color: "#666" }}>Select all that apply</p>
+      )}
 
-          {isMulti && !showExplanation && (
-            <button onClick={submitMultiAnswer} className="primary-btn" style={{ marginTop: 10 }}>Submit Answer</button>
-          )}
+      {currentQ.options.map((opt, i) => {
+        const isSelected = (selectedOptions[currentQuestion] || []).includes(i);
+        const correct = Array.isArray(currentQ.correct) ? currentQ.correct.includes(i) : currentQ.correct === i;
+        const show = isSubmitted;
 
-          {showExplanation && (
-            <div className="explanation-box">
-              <p>
-                <strong>
-                  {isMulti
-                    ? selectedOption.sort().toString() === currentQ.correct.sort().toString()
-                      ? "✅ Correct!"
-                      : "❌ Incorrect!"
-                    : selectedOption[0] === currentQ.correct
-                      ? "✅ Correct!"
-                      : "❌ Incorrect!"}
-                </strong> {currentQ.explanation}
-              </p>
-              <p><strong>Tip:</strong> 💡 {randomTip}</p>
-              <div style={{ display: "flex", gap: 10 }}>
-                <button onClick={goBack}>⬅ Back</button>
-                <button onClick={skipQuestion}>⏭ Skip</button>
-                <button onClick={nextQuestion}>Next ➡</button>
-              </div>
-            </div>
-          )}
+        let bg = "";
+        if (show) {
+          bg = correct ? "lightgreen" : isSelected ? "salmon" : "";
+        } else if (isSelected) {
+          bg = "#f0f0f0";
+        }
+
+        return (
+          <button
+            key={i}
+            disabled={show}
+            onClick={() => handleSelect(i)}
+            style={{
+              display: "block",
+              margin: "10px 0",
+              padding: 10,
+              fontWeight: isSelected ? "bold" : "normal",
+              backgroundColor: bg,
+              border: "1px solid #ccc",
+              width: "100%",
+              textAlign: "left"
+            }}
+          >
+            <strong>{String.fromCharCode(65 + i)}.</strong> {opt}
+          </button>
+        );
+      })}
+
+      {!isSubmitted && (
+        <button onClick={submitAnswer} className="primary-btn" style={{ marginTop: 20 }}>
+          Submit Answer
+        </button>
+      )}
+
+      {isSubmitted && (
+        <div className="explanation-box">
+          <p>
+            <strong>
+              {(Array.isArray(currentQ.correct)
+                ? JSON.stringify((selectedOptions[currentQuestion] || []).sort()) === JSON.stringify(currentQ.correct.sort())
+                : (selectedOptions[currentQuestion] || [])[0] === currentQ.correct)
+                ? "✅ Correct!"
+                : "❌ Incorrect!"
+              }
+            </strong> {currentQ.explanation}
+          </p>
         </div>
-      ) : quizCompleted ? (
-        <div style={{ textAlign: "center" }}>
+      )}
+
+      <div style={{ marginTop: 20, display: "flex", gap: 10 }}>
+        <button onClick={goToPrevious} disabled={currentQuestion === 0}>⬅ Back</button>
+        <button onClick={skipQuestion}>⏩ Skip</button>
+        <button onClick={goToNext}>Next ➡</button>
+      </div>
+
+      {quizCompleted && (
+        <div style={{ marginTop: 40, textAlign: "center" }}>
           <h2>✅ Quiz Completed!</h2>
           <p>✅ Correct Answers: {correctAnswers}</p>
           <p>❌ Incorrect Answers: {incorrectAnswers}</p>
           <p><strong>Your Score: {percentage}%</strong></p>
-          {percentage >= 85
-            ? <p style={{ color: "green" }}>⭐ You passed the quiz!</p>
-            : <p style={{ color: "crimson" }}>❗ Keep practicing to reach 85%.</p>
-          }
-
-          <h3 style={{ textAlign: "left", marginTop: 40 }}>🔹 Review Answers</h3>
-          {answers.map((ans, idx) => (
-            <div key={idx} style={{ textAlign: "left", marginBottom: 20 }}>
-              <p><strong>Q{idx + 1}:</strong> {ans.question}</p>
-              <p>Your answer: <strong>{ans.selected.map(i => `${String.fromCharCode(65 + i)}. ${ans.options[i]}`).join(", ")}</strong></p>
-              <p>Correct answer: <strong>{(Array.isArray(ans.correct) ? ans.correct : [ans.correct]).map(i => `${String.fromCharCode(65 + i)}. ${ans.options[i]}`).join(", ")}</strong></p>
-              <p style={{ color: JSON.stringify(ans.selected.sort()) === JSON.stringify((Array.isArray(ans.correct) ? ans.correct : [ans.correct]).sort()) ? "green" : "crimson" }}>
-                {JSON.stringify(ans.selected.sort()) === JSON.stringify((Array.isArray(ans.correct) ? ans.correct : [ans.correct]).sort()) ? "✅ Correct" : "❌ Incorrect"}
-              </p>
-              <p><em>{ans.explanation}</em></p>
-              <hr />
-            </div>
-          ))}
-          <button onClick={resetQuiz}>Restart Quiz</button>
+          <button onClick={resetQuiz} className="primary-btn">Restart Quiz</button>
         </div>
-      ) : null}
+      )}
     </div>
   );
 }
