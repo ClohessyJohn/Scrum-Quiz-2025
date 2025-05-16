@@ -25,11 +25,11 @@ export default function App() {
   ];
   const [randomTip, setRandomTip] = useState(tips[0]);
 
-  const isMultiCorrect = (q) => Array.isArray(q?.correct);
-  const isBoolean = (q) => q?.type === "boolean";
-
   useEffect(() => {
-    if (!originalQuestions || originalQuestions.length === 0) return;
+    if (!originalQuestions || originalQuestions.length === 0) {
+      console.error("No questions loaded from questions.js");
+      return;
+    }
     if (mode !== "landing" && !shuffled) {
       const shuffledQuestions = [...originalQuestions].sort(() => Math.random() - 0.5);
       setQuestions(shuffledQuestions);
@@ -54,11 +54,15 @@ export default function App() {
     return () => clearInterval(interval);
   }, [mode, quizCompleted]);
 
-  const recordAnswer = (q, selected, isCorrect) => {
-    const alreadyAnswered = answers.find((a) => a.question === q.question);
-    if (alreadyAnswered) return;
+  const isMultiCorrect = (q) => Array.isArray(q?.correct);
+  const isBoolean = (q) => q?.type === "boolean";
 
-    setAnswers((prev) => [
+  const hasAnswered = (index) => {
+    return answers.some(ans => ans.question === questions[index]?.question);
+  };
+
+  const recordAnswer = (q, selected, isCorrect) => {
+    setAnswers(prev => [
       ...prev,
       {
         question: q.question,
@@ -68,7 +72,7 @@ export default function App() {
         options: q.options
       }
     ]);
-    isCorrect ? setCorrectAnswers((c) => c + 1) : setIncorrectAnswers((c) => c + 1);
+    isCorrect ? setCorrectAnswers(c => c + 1) : setIncorrectAnswers(c => c + 1);
     setShowExplanation(true);
     setRandomTip(tips[Math.floor(Math.random() * tips.length)]);
   };
@@ -77,11 +81,10 @@ export default function App() {
     const q = questions[currentQuestion];
     if (!q || showExplanation) return;
     const isMulti = isMultiCorrect(q);
-
     if (isMulti) {
       const alreadySelected = selectedOption.includes(index);
       const updated = alreadySelected
-        ? selectedOption.filter((i) => i !== index)
+        ? selectedOption.filter(i => i !== index)
         : [...selectedOption, index];
       setSelectedOption(updated);
     } else {
@@ -96,25 +99,27 @@ export default function App() {
     if (!q || showExplanation) return;
     const isCorrect =
       selectedOption.length === q.correct.length &&
-      selectedOption.every((val) => q.correct.includes(val));
+      selectedOption.every(val => q.correct.includes(val));
     recordAnswer(q, selectedOption, isCorrect);
   };
 
   const nextQuestion = () => {
     if (currentQuestion < questions.length - 1) {
-      setSelectedOption([]);
-      setShowExplanation(false);
       setCurrentQuestion((prev) => prev + 1);
+      setSelectedOption([]);
+      setShowExplanation(hasAnswered(currentQuestion + 1));
     } else {
       setQuizCompleted(true);
     }
   };
 
-  const previousQuestion = () => {
+  const goBack = () => {
     if (currentQuestion > 0) {
       setCurrentQuestion((prev) => prev - 1);
-      setShowExplanation(answers[currentQuestion - 1] !== undefined);
-      setSelectedOption(answers[currentQuestion - 1]?.selected || []);
+      const prevQ = questions[currentQuestion - 1];
+      const prevAnswer = answers.find(ans => ans.question === prevQ.question);
+      setSelectedOption(prevAnswer ? prevAnswer.selected : []);
+      setShowExplanation(!!prevAnswer);
     }
   };
 
@@ -136,9 +141,11 @@ export default function App() {
     return `${m}:${s}`;
   };
 
-  const percentage = questions.length > 0 ? Math.round((correctAnswers / questions.length) * 100) : 0;
-  const currentQ = questions[currentQuestion];
-  const isMulti = isMultiCorrect(currentQ);
+  const percentage = questions.length > 0
+    ? Math.round((correctAnswers / questions.length) * 100)
+    : 0;
+  const currentQ = questions[currentQuestion] || null;
+  const isMulti = currentQ ? isMultiCorrect(currentQ) : false;
 
   if (mode === "landing") {
     return (
@@ -151,15 +158,19 @@ export default function App() {
     );
   }
 
-  if (!questions.length) {
-    return <div style={{ padding: 40 }}>Loading questions...</div>;
+  if (mode !== "landing" && questions.length === 0) {
+    return (
+      <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ padding: 40 }}>
+        <h2>Loading questions...</h2>
+      </div>
+    );
   }
 
   return (
     <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ maxWidth: 800, margin: "auto", padding: 20 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
         <h2>Scrum Master Practice Quiz 2025</h2>
-        <div>
+        <div style={{ display: "flex", gap: 8 }}>
           <button onClick={() => setMode("practice")}>Practice</button>
           <button onClick={() => { resetQuiz(); setMode("test"); }}>Test</button>
           <button onClick={() => setDarkMode(!darkMode)}>{darkMode ? "☀ Light" : "🌙 Dark"}</button>
@@ -171,7 +182,6 @@ export default function App() {
       )}
 
       <div style={{ marginBottom: 10 }}>Question {currentQuestion + 1} of {questions.length}</div>
-
       <div style={{ backgroundColor: "#eee", height: 6, marginBottom: 20 }}>
         <div style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%`, height: "100%", backgroundColor: "dodgerblue" }}></div>
       </div>
@@ -184,9 +194,12 @@ export default function App() {
               Select all that apply
             </p>
           )}
+
           {currentQ.options.map((option, index) => {
             const isSelected = selectedOption.includes(index);
-            const isCorrect = isMulti ? currentQ.correct.includes(index) : index === currentQ.correct;
+            const isCorrect = isMulti
+              ? currentQ.correct.includes(index)
+              : index === currentQ.correct;
             let bg = "";
             let fontWeight = "normal";
             if (!showExplanation && isSelected) {
@@ -200,17 +213,17 @@ export default function App() {
               <button
                 key={index}
                 onClick={() => handleAnswer(index)}
-                disabled={showExplanation}
                 style={{
                   display: "block",
                   margin: "10px 0",
                   backgroundColor: bg,
-                  fontWeight,
+                  fontWeight: fontWeight,
                   padding: 10,
                   border: "1px solid #ccc",
                   fontSize: "1rem",
                   textAlign: "left"
                 }}
+                disabled={showExplanation}
               >
                 <strong>{String.fromCharCode(65 + index)}.</strong> {option}
               </button>
@@ -218,7 +231,12 @@ export default function App() {
           })}
 
           {isMulti && !showExplanation && (
-            <button onClick={submitMultiAnswer} className="primary-btn" style={{ marginTop: 10 }}>
+            <button
+              onClick={submitMultiAnswer}
+              className="primary-btn"
+              style={{ marginTop: 10 }}
+              disabled={selectedOption.length === 0}
+            >
               Submit Answer
             </button>
           )}
@@ -234,16 +252,16 @@ export default function App() {
                     : selectedOption[0] === currentQ.correct
                       ? "✅ Correct!"
                       : "❌ Incorrect!"}
-                </strong> {currentQ.explanation}
+                </strong>{" "}
+                {currentQ.explanation}
               </p>
               <p><strong>Tip:</strong> 💡 {randomTip}</p>
+              <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+                <button onClick={goBack}>← Back</button>
+                <button onClick={nextQuestion}>Next →</button>
+              </div>
             </div>
           )}
-
-          <div style={{ marginTop: 20, display: "flex", gap: 10 }}>
-            <button onClick={previousQuestion} disabled={currentQuestion === 0}>← Back</button>
-            <button onClick={nextQuestion}>Next →</button>
-          </div>
         </div>
       ) : quizCompleted ? (
         <div style={{ textAlign: "center" }}>
@@ -253,26 +271,29 @@ export default function App() {
           <p><strong>Your Score: {percentage}%</strong></p>
           {percentage >= 85
             ? <p style={{ color: "green" }}>⭐ You passed the quiz!</p>
-            : <p style={{ color: "crimson" }}>❗ Keep practicing to reach 85%.</p>
-          }
+            : <p style={{ color: "crimson" }}>❗ Keep practicing to reach 85%.</p>}
 
-          <h3 style={{ textAlign: "left", marginTop: 40 }}>🔹 Review Answers</h3>
-          {answers.map((ans, idx) => (
-            <div key={idx} style={{ textAlign: "left", marginBottom: 20 }}>
-              <p><strong>Q{idx + 1}:</strong> {ans.question}</p>
-              <p>Your answer: <strong>{ans.selected.map(i => `${String.fromCharCode(65 + i)}. ${ans.options[i]}`).join(", ")}</strong></p>
-              <p>Correct answer: <strong>{(Array.isArray(ans.correct) ? ans.correct : [ans.correct]).map(i => `${String.fromCharCode(65 + i)}. ${ans.options[i]}`).join(", ")}</strong></p>
-              <p style={{ color: JSON.stringify(ans.selected.sort()) === JSON.stringify((Array.isArray(ans.correct) ? ans.correct : [ans.correct]).sort()) ? "green" : "crimson" }}>
-                {JSON.stringify(ans.selected.sort()) === JSON.stringify((Array.isArray(ans.correct) ? ans.correct : [ans.correct]).sort()) ? "✅ Correct" : "❌ Incorrect"}
-              </p>
-              <p><em>{ans.explanation}</em></p>
-              <hr />
-            </div>
-          ))}
+          <h3 style={{ textAlign: "left", marginTop: 40 }}>🔍 Review Your Answers</h3>
+          {answers.map((ans, idx) => {
+            const isCorrect =
+              JSON.stringify(ans.selected.sort()) === JSON.stringify((Array.isArray(ans.correct) ? ans.correct : [ans.correct]).sort());
+
+            return (
+              <div key={idx} style={{ textAlign: "left", marginBottom: 20 }}>
+                <p><strong>Q{idx + 1}:</strong> {ans.question}</p>
+                <p>Your answer: <strong>{ans.selected.map(i => `${String.fromCharCode(65 + i)}. ${ans.options[i]}`).join(", ")}</strong></p>
+                <p>Correct answer: <strong>{(Array.isArray(ans.correct) ? ans.correct : [ans.correct]).map(i => `${String.fromCharCode(65 + i)}. ${ans.options[i]}`).join(", ")}</strong></p>
+                <p style={{ color: isCorrect ? "green" : "crimson" }}>
+                  {isCorrect ? "✅ Correct" : "❌ Incorrect"}
+                </p>
+                <p><em>{ans.explanation}</em></p>
+                <hr />
+              </div>
+            );
+          })}
           <button onClick={resetQuiz}>Restart Quiz</button>
         </div>
       ) : null}
     </div>
   );
 }
-
