@@ -15,6 +15,8 @@ export default function App() {
   const [timer, setTimer] = useState(60 * 60);
   const [answers, setAnswers] = useState([]);
   const [shuffled, setShuffled] = useState(false);
+  const [bookmarked, setBookmarked] = useState([]);
+  const [answeredIndexes, setAnsweredIndexes] = useState([]);
 
   const tips = [
     "The Definition of Done creates shared understanding.",
@@ -24,6 +26,9 @@ export default function App() {
     "Sprint Retrospective fosters continuous improvement."
   ];
   const [randomTip, setRandomTip] = useState(tips[0]);
+
+  const isMultiCorrect = (q) => Array.isArray(q?.correct);
+  const isBoolean = (q) => q?.type === "boolean";
 
   const findDuplicateQuestions = (questions) => {
     const duplicates = [];
@@ -41,16 +46,12 @@ export default function App() {
 
   useEffect(() => {
     if (!originalQuestions || originalQuestions.length === 0) {
-      console.error("No questions loaded from questions.js");
+      console.error("No questions loaded.");
       return;
     }
     const duplicates = findDuplicateQuestions(originalQuestions);
     if (duplicates.length > 0) {
       console.warn("Duplicates found:", duplicates);
-    }
-    const invalidQuestions = originalQuestions.filter(q => !q.explanation || typeof q.explanation !== "string");
-    if (invalidQuestions.length > 0) {
-      console.warn("Questions missing or invalid explanations:", invalidQuestions);
     }
     if (mode !== "landing" && !shuffled) {
       const shuffledQuestions = [...originalQuestions].sort(() => Math.random() - 0.5);
@@ -75,32 +76,14 @@ export default function App() {
     }
     return () => clearInterval(interval);
   }, [mode, quizCompleted]);
-  const isMultiCorrect = (q) => Array.isArray(q?.correct);
-  const isBoolean = (q) => q?.type === "boolean";
-
-  const recordAnswer = (q, selected, isCorrect) => {
-    setAnswers((prev) => [
-      ...prev,
-      {
-        question: q.question,
-        selected,
-        correct: q.correct,
-        explanation: q.explanation,
-        options: q.options
-      }
-    ]);
-    isCorrect ? setCorrectAnswers((c) => c + 1) : setIncorrectAnswers((c) => c + 1);
-    setShowExplanation(true);
-    setRandomTip(tips[Math.floor(Math.random() * tips.length)]);
-  };
 
   const handleAnswer = (index) => {
     const q = questions[currentQuestion];
     if (!q || showExplanation) return;
     const isMulti = isMultiCorrect(q);
-
     if (isMulti) {
-      const updated = selectedOption.includes(index)
+      const alreadySelected = selectedOption.includes(index);
+      const updated = alreadySelected
         ? selectedOption.filter((i) => i !== index)
         : [...selectedOption, index];
       setSelectedOption(updated);
@@ -120,22 +103,41 @@ export default function App() {
     recordAnswer(q, selectedOption, isCorrect);
   };
 
+  const recordAnswer = (q, selected, isCorrect) => {
+    setAnswers((prev) => [
+      ...prev,
+      {
+        question: q.question,
+        selected,
+        correct: q.correct,
+        explanation: q.explanation,
+        options: q.options
+      }
+    ]);
+    setAnsweredIndexes((prev) =>
+      prev.includes(currentQuestion) ? prev : [...prev, currentQuestion]
+    );
+    isCorrect ? setCorrectAnswers((c) => c + 1) : setIncorrectAnswers((c) => c + 1);
+    setShowExplanation(true);
+    setRandomTip(tips[Math.floor(Math.random() * tips.length)]);
+  };
+
   const nextQuestion = () => {
     if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion((prev) => prev + 1);
+      setCurrentQuestion(currentQuestion + 1);
       setSelectedOption([]);
-      setShowExplanation(false);
+      setShowExplanation(answeredIndexes.includes(currentQuestion + 1));
     } else {
       setQuizCompleted(true);
     }
   };
 
-  const previousQuestion = () => {
-    if (currentQuestion > 0) {
-      setCurrentQuestion((prev) => prev - 1);
-      setSelectedOption([]);
-      setShowExplanation(false);
-    }
+  const toggleBookmark = (index) => {
+    setBookmarked((prev) =>
+      prev.includes(index)
+        ? prev.filter((i) => i !== index)
+        : [...prev, index]
+    );
   };
 
   const resetQuiz = () => {
@@ -148,6 +150,8 @@ export default function App() {
     setTimer(60 * 60);
     setAnswers([]);
     setShuffled(false);
+    setBookmarked([]);
+    setAnsweredIndexes([]);
   };
 
   const formatTime = (seconds) => {
@@ -156,20 +160,19 @@ export default function App() {
     return `${m}:${s}`;
   };
 
-  const percentage = questions.length > 0
-    ? Math.round((correctAnswers / questions.length) * 100)
-    : 0;
   const currentQ = questions[currentQuestion] || null;
   const isMulti = currentQ ? isMultiCorrect(currentQ) : false;
+  const percentage = questions.length > 0 ? Math.round((correctAnswers / questions.length) * 100) : 0;
+
   if (mode === "landing") {
     return (
       <div className={`app-container ${darkMode ? "dark" : ""}`} style={{ textAlign: "center", padding: 40 }}>
         <h1>Scrum Master Practice Quiz 2025</h1>
-        <p><strong>Designed by John Clohessy</strong></p>
-        <p>
-          This tool is intended for independent learning and practice. It is not affiliated with, endorsed by, or associated with Scrum.org or any other certifying body.
+        <p>Designed by <strong>John Clohessy</strong></p>
+        <p style={{ fontSize: "0.9rem", color: "#777" }}>
+          This quiz is <strong>not affiliated</strong> with Scrum.org or any certification body.  
+          It's built to help reinforce Scrum knowledge in an independent learning format.
         </p>
-        <p>This quiz helps prepare for the PSM I certification by reinforcing Scrum concepts and practical application.</p>
         <button onClick={() => setMode("practice")} className="primary-btn" style={{ marginTop: 30 }}>
           Start Quiz
         </button>
@@ -202,10 +205,6 @@ export default function App() {
 
       <div style={{ marginBottom: 10 }}>Question {currentQuestion + 1} of {questions.length}</div>
 
-      <div style={{ backgroundColor: "#eee", height: 6, marginBottom: 20 }}>
-        <div style={{ width: `${((currentQuestion + 1) / questions.length * 100).toFixed(2)}%`, height: "100%", backgroundColor: "dodgerblue" }}></div>
-      </div>
-
       {!quizCompleted && currentQ ? (
         <div>
           <h3>{currentQ.question} {isBoolean(currentQ) && <span>(True/False)</span>}</h3>
@@ -236,7 +235,7 @@ export default function App() {
                   display: "block",
                   margin: "10px 0",
                   backgroundColor: bg,
-                  fontWeight,
+                  fontWeight: fontWeight,
                   padding: 10,
                   border: "1px solid #ccc",
                   fontSize: "1rem",
@@ -249,26 +248,16 @@ export default function App() {
             );
           })}
 
-          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 20 }}>
-            <button onClick={previousQuestion}>← Back</button>
-
-            {isMulti && !showExplanation && (
-              <button
-                onClick={submitMultiAnswer}
-                className="primary-btn"
-                disabled={selectedOption.length === 0}
-              >
-                Submit Answer
-              </button>
-            )}
-
+          {isMulti && !showExplanation && (
             <button
-              onClick={nextQuestion}
-              disabled={!showExplanation}
+              onClick={submitMultiAnswer}
+              className="primary-btn"
+              style={{ marginTop: 10 }}
+              disabled={selectedOption.length === 0}
             >
-              Next →
+              Submit Answer
             </button>
-          </div>
+          )}
 
           {showExplanation && (
             <div className="explanation-box">
@@ -286,6 +275,69 @@ export default function App() {
               <p><strong>Tip:</strong> 💡 {randomTip}</p>
             </div>
           )}
+
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 10 }}>
+            <button
+              onClick={() => toggleBookmark(currentQuestion)}
+              style={{
+                backgroundColor: bookmarked.includes(currentQuestion) ? "#ffd700" : "#ccc",
+                padding: "6px 12px",
+                border: "none",
+                borderRadius: "4px"
+              }}
+            >
+              {bookmarked.includes(currentQuestion) ? "★ Bookmarked" : "☆ Bookmark"}
+            </button>
+
+            <span style={{ fontSize: "0.9rem", color: "#666" }}>
+              {answeredIndexes.includes(currentQuestion) ? "Answered" : "Unanswered"}
+            </span>
+          </div>
+
+          <div style={{ marginTop: 20, display: "flex", gap: 10 }}>
+            <button
+              onClick={() => {
+                if (currentQuestion > 0) {
+                  setCurrentQuestion(currentQuestion - 1);
+                  setSelectedOption([]);
+                  setShowExplanation(answeredIndexes.includes(currentQuestion - 1));
+                }
+              }}
+              disabled={currentQuestion === 0}
+            >
+              ← Back
+            </button>
+
+            <button
+              onClick={nextQuestion}
+              disabled={currentQuestion >= questions.length - 1}
+            >
+              Next →
+            </button>
+          </div>
+
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 20 }}>
+            {questions.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => {
+                  setCurrentQuestion(idx);
+                  setShowExplanation(answeredIndexes.includes(idx));
+                  setSelectedOption([]);
+                }}
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: 4,
+                  backgroundColor: answeredIndexes.includes(idx) ? "lightgreen" : "#eee",
+                  border: bookmarked.includes(idx) ? "2px solid gold" : "1px solid #ccc",
+                  fontWeight: currentQuestion === idx ? "bold" : "normal"
+                }}
+              >
+                {idx + 1}
+              </button>
+            ))}
+          </div>
         </div>
       ) : quizCompleted ? (
         <div style={{ textAlign: "center" }}>
